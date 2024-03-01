@@ -94,6 +94,8 @@
 
 ### Rook
 
+- can move in + infinitely
+
 |     | A   | B   | C   | D   | E   | F   | G   | H   |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 8   |     |     |     | x   |     |     |     |     |
@@ -105,19 +107,60 @@
 | 2   |     |     |     | x   |     |     |     |     |
 | 1   |     |     |     | x   |     |     |     |     |
 
-- can move in + infinitely
-
 ### Bishop
 
-|     | A   | B   | C   | D   | E   | F   | G   | H   |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 8   |     |     |     |     |     |     |     | x   |
-| 7   | x   |     |     |     |     |     | x   |     |
-| 6   |     | x   |     |     |     | x   |     |     |
-| 5   |     |     | x   |     | x   |     |     |     |
-| 4   |     |     |     | ♗   |     |     |     |     |
-| 3   |     |     | x   |     | x   |     |     |     |
-| 2   |     | x   |     |     |     | x   |     |     |
-| 1   | x   |     |     |     |     |     | x   |     |
-
 - can move in x infinitely
+  | | A | B | C | D | E | F | G | H |
+  | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+  | 8 | | | | | | | | x |
+  | 7 | x | | | | | | x | |
+  | 6 | | x | | | | x | | |
+  | 5 | | | x | | x | | | |
+  | 4 | | | | ♗ | | | | |
+  | 3 | | | x | | x | | | |
+  | 2 | | x | | | | x | | |
+  | 1 | x | | | | | | x | |
+
+### Pseudo API for this chess_game_engine
+
+```txt
+let game = new Game;
+
+// start the game, player should make a move immediatly.
+// `start` also starts a counter.
+game.start(); // with white
+game.start_with(White/Black);
+
+// checks who's turn is this
+let who = game.whose_turn(); // white/black
+
+// show a visual representation of chess, through stdout
+game.show_board();
+
+// to select a character
+let character = game.select(Pawn(1, G)); // warns if not legal
+
+// list out possible moves for selected character.
+let moves = character.possible_moves();
+
+// move character to new position,
+// in case of valid move, it spits out effect
+// otherwise throws a error.
+// also makes the timer stop.
+let res = character.move_to(2, G); // ok/err
+
+// can't select character, if you dont' switch side.
+game.select(Pawan(2,G)); warns since turn over.
+
+// changes the side to get select working again.
+// also starts a counter.
+game.change_side();
+
+let who = game.whose_turn(); // white/black
+
+game.accept_draw();
+
+game.is_game_over();
+
+game.check_winner();
+```
