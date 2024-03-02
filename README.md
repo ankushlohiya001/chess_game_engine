@@ -5,16 +5,15 @@
 - white
 - black
 
-## characters
+## Characters
+- K: King x 1 ♔
+- Q: Queen x 1 ♕
+- N: Knight x 2 ♘
+- P: Pawn x 8 ♙
+- R: Rook x 2 ♖
+- B: Bishop x 2 ♗
 
-- king x 1 ♔
-- queen x 1 ♕
-- knight x 2 ♘
-- pawn x 8 ♙
-- rook x 2 ♖
-- bishop x 2 ♗
-
-## Positions
+## Initial Positions (White)
 
 - King: 1E
 - Queen: 1D
@@ -59,7 +58,7 @@
 
 ### Knight
 
-- 2 forward, then left/right
+- 2 forward in anyone of the + direction then left/right
 
 |     | A   | B   | C   | D   | E   | F   | G   | H   |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -74,9 +73,9 @@
 
 ### Pawn
 
-- starting may be 1,2 forward,
-- after then fix 1 forward
-- if there's someone on top left/right can move,
+- starting 1,(2 optional) forward,
+- after that always 1 forward
+- if there's opponent's character on top-left / top-right can move,
 
 |     | A   | B   | C   | D    | E   | F    | G   | H   |
 | --- | --- | --- | --- | ---- | --- | ---- | --- | --- |
@@ -89,7 +88,7 @@
 | 2   |     | ♙   |     | ♙    | ♙   | ♙    |     | ♙   |
 | 1   |     |     |     |      |     |      |     |     |
 
-> - mendatory required to swap with any of following:
+> - mandatory required to swap with any of the following:
 >   ♖, ♗, ♘, ♕
 
 ### Rook
@@ -126,9 +125,10 @@
 ```javascript
 let game = new Game();
 
-// start the game, player should make a move immediatly.
-// `start` also starts a counter.
+// start the game, `start` also starts a counter.
 game.start(); // with white
+// The player should make a move.
+
 game.start_with(White / Black);
 
 // checks who's turn is this
@@ -137,20 +137,20 @@ let who = game.whose_turn(); // white/black
 // show a visual representation of chess, through stdout
 game.show_board();
 
-// to select a character
-let character = game.select(Pawn(1, G)); // warns if not legal
+// to select a character //if this engine doesn't provide GUI selection replace select with move
+let character = game.select(Pawn(1, G)); // warns if not legal 
 
-// list out possible moves for selected character.
+// List out possible moves for selected character.
 let moves = character.possible_moves();
 
-// move character to new position,
-// in case of valid move, it spits out effect
-// otherwise throws a error.
+// Move the character to a new position,
+// In case of a valid move, it spits out the effect
+// otherwise throws an error.
 // also makes the timer stop.
 let res = character.move_to(2, G); // ok/err
 
-// can't select character, if you dont' switch side.
-game.select(Pawan(2, G)); // warns since turn over.
+// can't select a character, if you don't switch side.
+game.select(Pawn(2, G)); // warns since turn over.
 
 // changes the side to get select working again.
 // also starts a counter.
@@ -158,9 +158,13 @@ game.change_side();
 
 let who = game.whose_turn(); // white/black
 
-game.accept_draw();
+game.request_draw();
+
+game.resign();
 
 game.is_game_over();
 
 game.check_winner();
+
+game.can_pawn_promote();
 ```
