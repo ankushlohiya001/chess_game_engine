@@ -1,10 +1,7 @@
 #![allow(dead_code)]
 
-use crate::character::{self, *};
-
-pub enum GameError {
-    InvalidMove,
-}
+use crate::character::*;
+use crate::errors::GameError;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Side {
@@ -43,7 +40,7 @@ impl Game {
 
     pub fn select(&mut self, character: Character) -> Result<Character, GameError> {
         // select a character / return an error
-        Err(GameError::InvalidMove)
+        Err(GameError::EmptyCell)
     }
 
     pub fn change_side(&mut self) {

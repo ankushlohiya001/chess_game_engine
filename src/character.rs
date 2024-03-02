@@ -1,13 +1,9 @@
 #![allow(dead_code)]
+
+use crate::errors::GameError;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Pos(u8, char);
-
-#[derive(Debug, Clone, Copy, Default)]
-pub enum ChessError {
-    InvalidMove,
-    #[default]
-    NoError,
-}
 
 #[derive(Debug)]
 pub enum Character {
@@ -28,7 +24,7 @@ impl Character {
         false
     }
 
-    pub fn move_to(&mut self, new_pos: Pos) -> Result<(), ChessError> {
-        Err(ChessError::InvalidMove)
+    pub fn move_to(&mut self, new_pos: Pos) -> Result<(), GameError> {
+        Err(GameError::InvalidMove)
     }
 }
