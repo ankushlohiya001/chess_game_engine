@@ -1,3 +1,4 @@
-pub fn test_lib() {
-    println!("fd");
-}
+pub mod character;
+pub mod game;
+
+pub mod prelude {}
