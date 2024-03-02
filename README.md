@@ -123,13 +123,13 @@
 
 ### Pseudo API for this chess_game_engine
 
-```txt
-let game = new Game;
+```javascript
+let game = new Game();
 
 // start the game, player should make a move immediatly.
 // `start` also starts a counter.
 game.start(); // with white
-game.start_with(White/Black);
+game.start_with(White / Black);
 
 // checks who's turn is this
 let who = game.whose_turn(); // white/black
@@ -150,7 +150,7 @@ let moves = character.possible_moves();
 let res = character.move_to(2, G); // ok/err
 
 // can't select character, if you dont' switch side.
-game.select(Pawan(2,G)); warns since turn over.
+game.select(Pawan(2, G)); // warns since turn over.
 
 // changes the side to get select working again.
 // also starts a counter.
