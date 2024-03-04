@@ -1,30 +1,36 @@
 #![allow(dead_code)]
 
 use crate::errors::GameError;
+use crate::moves::{Moving, Pos};
 
 #[derive(Debug, Clone, Copy)]
-pub struct Pos(u8, char);
+pub enum Side {
+    White,
+    Black,
+}
 
-#[derive(Debug)]
-pub enum Character {
-    King(Pos),
-    Queen(Pos),
-    Knight(Pos),
-    Pawn(Pos),
-    Bishop(Pos),
-    Rook(Pos),
+#[derive(Debug, Clone, Copy)]
+pub struct Character {
+    position: Pos,
+    side: Side,
 }
 
 impl Character {
-    pub fn possible_moves(&self) -> Vec<Pos> {
-        Vec::new()
+    pub fn pos_at_matrix(&self) -> (usize, usize) {
+        let pos = self.position;
+        (
+            (8 - pos.rank()) as usize,
+            pos.file() as usize - 'a' as usize,
+        )
     }
+}
 
-    pub fn can_move(&self, new_pos: Pos) -> bool {
-        false
-    }
+#[test]
+fn testing() {
+    let king = Character {
+        position: Pos('e', 1),
+        side: Side::White,
+    };
 
-    pub fn move_to(&mut self, new_pos: Pos) -> Result<(), GameError> {
-        Err(GameError::InvalidMove)
-    }
+    assert_eq!(king.pos_at_matrix(), (7, 4));
 }

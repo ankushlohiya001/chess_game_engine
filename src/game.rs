@@ -3,13 +3,8 @@
 use crate::character::*;
 use crate::errors::GameError;
 
-#[derive(Debug, Clone, Copy)]
-pub enum Side {
-    White,
-    Black,
-}
-
 pub struct Game {
+    matrix: [[Option<Character>; 8]; 8],
     side: Side,
     sel_character: Option<Character>,
 }
@@ -17,10 +12,13 @@ pub struct Game {
 impl Game {
     pub fn new() -> Game {
         Game {
+            matrix: [[None; 8]; 8],
             side: Side::White,
             sel_character: None,
         }
     }
+
+    fn place_characters(&mut self) {}
 
     pub fn start(&self) {
         todo!("need to do something about which i'm unaware")
