@@ -1,4 +1,4 @@
-use crate::{moves::Moving, pieces::Piece};
+use crate::pieces::Side;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Pos(pub char, pub u8);
@@ -21,12 +21,25 @@ impl Pos {
 
 #[derive(Debug, Clone, Copy)]
 pub enum Character {
-    King,
-    Queen,
-    Knight,
-    Rook,
-    Bishop,
-    Pawn,
+    King(Side),
+    Queen(Side),
+    Knight(Side),
+    Rook(Side),
+    Bishop(Side),
+    Pawn(Side),
+}
+
+impl Character {
+    pub fn side(self) -> Side {
+        match self {
+            Self::King(side) => side,
+            Self::Queen(side) => side,
+            Self::Knight(side) => side,
+            Self::Rook(side) => side,
+            Self::Bishop(side) => side,
+            Self::Pawn(side) => side,
+        }
+    }
 }
 
 pub struct ChessMatrix {

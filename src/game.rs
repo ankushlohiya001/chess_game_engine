@@ -2,8 +2,7 @@
 
 use crate::chess_matrix::{ChessMatrix, Pos};
 use crate::errors::GameError;
-use crate::moves::Moving;
-use crate::pieces::{King, Piece, Side};
+use crate::pieces::{Piece, Side};
 
 pub struct Game {
     matrix: ChessMatrix,
@@ -36,12 +35,11 @@ impl Game {
         todo!("somehow show board to user")
     }
 
-    pub fn select(&mut self, pos: Pos) -> Result<impl Moving, GameError> {
+    pub fn select(&mut self, pos: Pos) -> Result<Piece, GameError> {
         // select a character / return an error
         let maybe_character = self.matrix.piece_at(pos);
         if let Some(character) = maybe_character {
-            let piece = Piece::new(pos, Side::White);
-            Ok(piece)
+            Ok(Piece::new(character, pos, character.side()))
         } else {
             Err(GameError::EmptyCell)
         }

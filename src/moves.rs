@@ -11,3 +11,8 @@ pub trait Moving {
         Err(GameError::InvalidMove)
     }
 }
+
+pub fn king_move(pos: Pos) -> Vec<Pos> {
+    let mut moves = Vec::with_capacity(9);
+    moves
+}
