@@ -1,20 +1,20 @@
 #![allow(dead_code)]
 
-use crate::character::*;
+use crate::chess_matrix::{ChessMatrix, Pos};
 use crate::errors::GameError;
+use crate::moves::Moving;
+use crate::pieces::{King, Piece, Side};
 
 pub struct Game {
-    matrix: [[Option<Character>; 8]; 8],
+    matrix: ChessMatrix,
     side: Side,
-    sel_character: Option<Character>,
 }
 
 impl Game {
     pub fn new() -> Game {
         Game {
-            matrix: [[None; 8]; 8],
+            matrix: ChessMatrix::new(),
             side: Side::White,
-            sel_character: None,
         }
     }
 
@@ -36,9 +36,15 @@ impl Game {
         todo!("somehow show board to user")
     }
 
-    pub fn select(&mut self, character: Character) -> Result<Character, GameError> {
+    pub fn select(&mut self, pos: Pos) -> Result<impl Moving, GameError> {
         // select a character / return an error
-        Err(GameError::EmptyCell)
+        let maybe_character = self.matrix.piece_at(pos);
+        if let Some(character) = maybe_character {
+            let piece = Piece::new(pos, Side::White);
+            Ok(piece)
+        } else {
+            Err(GameError::EmptyCell)
+        }
     }
 
     pub fn change_side(&mut self) {
