@@ -1,5 +1,26 @@
 // use chess_game_engine;
+//
+
+trait Jk {
+    fn pok(&self) {
+        println!("joker");
+    }
+}
+
+trait Lk {
+    fn pok(&self) {
+        println!("Loker");
+    }
+}
+struct Pk {}
+
+impl Pk {
+    fn pok(&self) {
+        println!("poker");
+    }
+}
+
 fn main() {
-    let ch: u8 = 'a' as u8;
-    println!("just an example {}", ch);
+    let pk = Pk {};
+    pk.pok();
 }

@@ -4,4 +4,5 @@ pub enum GameError {
     EmptyCell,
     GameOver,
     SideNotChanged,
+    SideAlreadyChanged,
 }

@@ -7,6 +7,7 @@ use crate::pieces::{Piece, Side};
 pub struct Game {
     matrix: ChessMatrix,
     side: Side,
+    move_done: bool,
 }
 
 impl Game {
@@ -14,17 +15,19 @@ impl Game {
         Game {
             matrix: ChessMatrix::new(),
             side: Side::White,
+            move_done: false,
         }
     }
 
     fn place_characters(&mut self) {}
 
-    pub fn start(&self) {
-        todo!("need to do something about which i'm unaware")
+    pub fn start(&mut self) {
+        self.start_with(Side::White);
     }
 
     pub fn start_with(&mut self, side: Side) {
         self.side = side;
+        self.place_characters();
     }
 
     pub fn whose_turn(&self) -> Side {
@@ -35,21 +38,32 @@ impl Game {
         todo!("somehow show board to user")
     }
 
-    pub fn select(&mut self, pos: Pos) -> Result<Piece, GameError> {
+    pub fn select(&mut self, file: char, rank: u8) -> Result<Piece, GameError> {
         // select a character / return an error
-        let maybe_character = self.matrix.piece_at(pos);
-        if let Some(character) = maybe_character {
-            Ok(Piece::new(character, pos, character.side()))
+        if !self.move_done {
+            let pos = Pos(file, rank);
+            let maybe_character = self.matrix.piece_at(pos);
+            if let Some(character) = maybe_character {
+                Ok(Piece::new(character, pos, character.side()))
+            } else {
+                Err(GameError::EmptyCell)
+            }
         } else {
-            Err(GameError::EmptyCell)
+            Err(GameError::SideNotChanged)
         }
     }
 
-    pub fn change_side(&mut self) {
-        self.side = match self.side {
-            Side::White => Side::Black,
-            Side::Black => Side::White,
-        };
+    pub fn change_side(&mut self) -> Result<(), GameError> {
+        if self.move_done {
+            self.side = match self.side {
+                Side::White => Side::Black,
+                Side::Black => Side::White,
+            };
+            self.move_done = false;
+            Ok(())
+        } else {
+            Err(GameError::SideAlreadyChanged)
+        }
     }
 
     pub fn request_draw(&mut self) {

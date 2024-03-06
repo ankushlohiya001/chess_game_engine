@@ -6,6 +6,7 @@
 - black
 
 ## Characters
+
 - K: King x 1 ♔
 - Q: Queen x 1 ♕
 - N: Knight x 2 ♘
@@ -138,7 +139,7 @@ let who = game.whose_turn(); // white/black
 game.show_board();
 
 // to select a character //if this engine doesn't provide GUI selection replace select with move
-let character = game.select(Pawn(1, G)); // warns if not legal 
+let character = game.select(1, G); // warns if not legal
 
 // List out possible moves for selected character.
 let moves = character.possible_moves();
