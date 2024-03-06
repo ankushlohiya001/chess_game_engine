@@ -44,7 +44,11 @@ impl Game {
             let pos = Pos(file, rank);
             let maybe_character = self.matrix.piece_at(pos);
             if let Some(character) = maybe_character {
-                Ok(Piece::new(character, pos, character.side()))
+                if character.side() == self.side {
+                    Ok(Piece::new(character, pos, character.side()))
+                } else {
+                    Err(GameError::OpponentPiece)
+                }
             } else {
                 Err(GameError::EmptyCell)
             }

@@ -3,7 +3,7 @@
 use crate::errors::GameError;
 use crate::moves::{Moving, Pos};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Side {
     White,
     Black,
