@@ -138,19 +138,19 @@ let who = game.whose_turn(); // white/black
 // show a visual representation of chess, through stdout
 game.show_board();
 
-// to select a character //if this engine doesn't provide GUI selection replace select with move
-let character = game.select(1, G); // warns if not legal
+// to select a piece //if this engine doesn't provide GUI selection replace select with move
+let piece = game.select(1, G); // warns if not legal
 
-// List out possible moves for selected character.
-let moves = character.possible_moves();
+// List out possible moves for selected piece.
+let moves = piece.possible_moves();
 
-// Move the character to a new position,
+// Move the piece to a new position,
 // In case of a valid move, it spits out the effect
 // otherwise throws an error.
 // also makes the timer stop.
-let res = character.move_to(2, G); // ok/err
+let res = piece.move_to(2, G); // ok/err
 
-// can't select a character, if you don't switch side.
+// can't select a piece, if you don't switch side.
 game.select(Pawn(2, G)); // warns since turn over.
 
 // changes the side to get select working again.

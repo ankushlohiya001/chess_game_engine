@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 
-use crate::chess_matrix::Character;
 use crate::errors::GameError;
 use crate::moves::{Moving, Pos};
 
@@ -8,6 +7,29 @@ use crate::moves::{Moving, Pos};
 pub enum Side {
     White,
     Black,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Character {
+    King(Side),
+    Queen(Side),
+    Knight(Side),
+    Rook(Side),
+    Bishop(Side),
+    Pawn(Side),
+}
+
+impl Character {
+    pub fn side(self) -> Side {
+        match self {
+            Self::King(side) => side,
+            Self::Queen(side) => side,
+            Self::Knight(side) => side,
+            Self::Rook(side) => side,
+            Self::Bishop(side) => side,
+            Self::Pawn(side) => side,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
