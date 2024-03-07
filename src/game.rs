@@ -42,7 +42,7 @@ impl Game {
         // select a character / return an error
         if !self.move_done {
             let pos = Pos(file, rank);
-            let maybe_character = self.matrix.piece_at(pos);
+            let maybe_character = self.matrix.character_at(pos);
             if let Some(character) = maybe_character {
                 if character.side() == self.side {
                     Ok(Piece::new(character, pos, character.side()))
@@ -87,4 +87,15 @@ impl Default for Game {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[test]
+fn game_test() {
+    let mut game = Game::new();
+    game.start();
+    let res = game.change_side();
+    assert_eq!(res, Err(GameError::SideAlreadyChanged));
+
+    let whose_turn = game.whose_turn();
+    assert_eq!(whose_turn, Side::White);
 }

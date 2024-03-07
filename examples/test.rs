@@ -1,26 +1,7 @@
-// use chess_game_engine;
-//
-
-trait Jk {
-    fn pok(&self) {
-        println!("joker");
-    }
-}
-
-trait Lk {
-    fn pok(&self) {
-        println!("Loker");
-    }
-}
-struct Pk {}
-
-impl Pk {
-    fn pok(&self) {
-        println!("poker");
-    }
-}
+use std::{borrow::BorrowMut, cell::RefCell, rc::Rc};
 
 fn main() {
-    let pk = Pk {};
-    pk.pok();
+    let mut arr = Rc::new(RefCell::new(34));
+    let mut refs = arr.borrow_mut();
+    println!("{:?}", pk);
 }

@@ -38,10 +38,12 @@ impl ChessMatrix {
         row * 8 + col
     }
 
-    pub fn piece_at(&self, pos: Pos) -> Option<Character> {
+    pub fn character_at(&self, pos: Pos) -> Option<Character> {
         let index = ChessMatrix::index_from_rowcol(pos);
         self.matrix[index]
     }
+
+    // pub fn move_character(&mut self, character: Character)
 
     pub fn place_character(&mut self, character: Character, pos: Pos) -> Result<(), GameError> {
         let index = ChessMatrix::index_from_rowcol(pos);
