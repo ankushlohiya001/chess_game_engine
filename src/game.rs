@@ -2,7 +2,8 @@
 
 use crate::chess_matrix::{ChessMatrix, Pos};
 use crate::errors::GameError;
-use crate::pieces::{Piece, Side};
+use crate::moves::Moving;
+use crate::pieces::{self, Piece, Side};
 
 pub struct Game {
     matrix: ChessMatrix,
@@ -38,7 +39,7 @@ impl Game {
         todo!("somehow show board to user")
     }
 
-    pub fn select(&mut self, file: char, rank: u8) -> Result<Piece, GameError> {
+    pub fn pick(&mut self, file: char, rank: u8) -> Result<Piece, GameError> {
         // select a character / return an error
         if !self.move_done {
             let pos = Pos(file, rank);
@@ -55,6 +56,20 @@ impl Game {
         } else {
             Err(GameError::SideNotChanged)
         }
+    }
+
+    pub fn place(&mut self, piece: Piece, file: char, rank: u8) -> Result<(), GameError> {
+        let pos = Pos(file, rank);
+        if piece.can_move(pos) {
+            self.matrix.place_character(piece.character, pos)
+        } else {
+            Err(GameError::InvalidMove)
+        }
+    }
+
+    pub fn place_back(&mut self, piece: Piece) {
+        let pos = piece.position;
+        self.place(piece, pos.file(), pos.rank()).unwrap();
     }
 
     pub fn change_side(&mut self) -> Result<(), GameError> {

@@ -34,9 +34,9 @@ impl Character {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Piece {
-    character: Character,
-    position: Pos,
-    side: Side,
+    pub character: Character,
+    pub position: Pos,
+    pub side: Side,
 }
 
 impl Piece {
