@@ -139,7 +139,7 @@ let who = game.whose_turn(); // white/black
 game.show_board();
 
 // to select a piece //if this engine doesn't provide GUI selection replace select with move
-let piece = game.select(1, G); // warns if not legal
+let piece = game.pick(1, G); // warns if not legal
 
 // List out possible moves for selected piece.
 let moves = piece.possible_moves();
@@ -148,10 +148,15 @@ let moves = piece.possible_moves();
 // In case of a valid move, it spits out the effect
 // otherwise throws an error.
 // also makes the timer stop.
-let res = piece.move_to(2, G); // ok/err
+// let res = piece.move_to(2, G); // ok/err
+game.place(piece, 2, G); // atleast for now
+// can otherwise do following
+// piece.place_back(); // to `unpick` and allowing  `picking` new `piece`
+
+game.place_back(piece); // atleast for now
 
 // can't select a piece, if you don't switch side.
-game.select(Pawn(2, G)); // warns since turn over.
+game.pick(2, G); // warns since turn over.
 
 // changes the side to get select working again.
 // also starts a counter.
