@@ -43,7 +43,17 @@ impl ChessMatrix {
         self.matrix[index]
     }
 
-    // pub fn move_character(&mut self, character: Character)
+    pub fn pick_character(&mut self, pos: Pos) -> Result<Character, GameError> {
+        if let Some(chracter) = self.character_at(pos) {
+            // somehow replace these lines as are redundent
+            let index = ChessMatrix::index_from_rowcol(pos);
+            self.matrix[index] = None;
+
+            Ok(chracter)
+        } else {
+            Err(GameError::EmptyCell)
+        }
+    }
 
     pub fn place_character(&mut self, character: Character, pos: Pos) -> Result<(), GameError> {
         let index = ChessMatrix::index_from_rowcol(pos);

@@ -43,11 +43,12 @@ impl Game {
         // select a character / return an error
         if !self.move_done {
             let pos = Pos(file, rank);
-            let maybe_character = self.matrix.character_at(pos);
-            if let Some(character) = maybe_character {
+            let maybe_character = self.matrix.pick_character(pos);
+            if let Ok(character) = maybe_character {
                 if character.side() == self.side {
                     Ok(Piece::new(character, pos, character.side()))
                 } else {
+                    // need to place back piece, do remember
                     Err(GameError::OpponentPiece)
                 }
             } else {
@@ -114,3 +115,5 @@ fn game_test() {
     let whose_turn = game.whose_turn();
     assert_eq!(whose_turn, Side::White);
 }
+
+// somehow moves most piece related stuff to piece module,
