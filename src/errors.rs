@@ -7,4 +7,5 @@ pub enum GameError {
     OpponentPiece,
     InvalidMove,
     GameOver,
+    InvalidPosition,
 }

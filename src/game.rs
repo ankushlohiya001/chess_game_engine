@@ -3,7 +3,7 @@
 use crate::chess_matrix::{ChessMatrix, Pos};
 use crate::errors::GameError;
 use crate::moves::Moving;
-use crate::pieces::{self, Piece, Side};
+use crate::pieces::{self, Character, Piece, Side};
 
 pub struct Game {
     matrix: ChessMatrix,
@@ -46,7 +46,7 @@ impl Game {
             let maybe_character = self.matrix.pick_character(pos);
             if let Ok(character) = maybe_character {
                 if character.side() == self.side {
-                    Ok(Piece::new(character, pos, character.side()))
+                    Ok(Piece::new(character, pos))
                 } else {
                     // need to place back piece, do remember
                     Err(GameError::OpponentPiece)
@@ -114,6 +114,29 @@ fn game_test() {
 
     let whose_turn = game.whose_turn();
     assert_eq!(whose_turn, Side::White);
+
+    let maybe_piece = game.pick('a', 1);
+    if let Err(error) = maybe_piece {
+        assert_eq!(error, GameError::EmptyCell);
+    }
+
+    let res = game.place(
+        Piece::new(Character::Pawn(Side::White), Pos('a', 1)),
+        'a',
+        2,
+    );
+
+    assert!(res.is_ok());
+
+    let maybe_piece = game.pick('a', 1);
+    if let Err(error) = maybe_piece {
+        assert_eq!(error, GameError::EmptyCell);
+    }
+
+    let maybe_piece = game.pick('a', 2);
+    assert!(maybe_piece.is_ok());
+    let piece = maybe_piece.unwrap();
+    assert_eq!(piece.position, Pos('a', 2));
 }
 
 // somehow moves most piece related stuff to piece module,

@@ -40,20 +40,13 @@ pub struct Piece {
 }
 
 impl Piece {
-    pub fn new(character: Character, position: Pos, side: Side) -> Self {
+    pub fn new(character: Character, position: Pos) -> Self {
+        let side = character.side();
         Piece {
             character,
             position,
             side,
         }
-    }
-
-    pub fn pos_at_matrix(&self) -> (usize, usize) {
-        let pos = self.position;
-        (
-            (8 - pos.rank()) as usize,
-            pos.file() as usize - 'a' as usize,
-        )
     }
 }
 
@@ -63,6 +56,14 @@ impl Moving for Piece {
     }
 
     fn can_move(&self, new_pos: Pos) -> bool {
-        false
+        true
     }
+}
+
+#[test]
+fn piece_test() {
+    let piece = Piece::new(Character::King(Side::White), Pos('a', 1));
+
+    assert_eq!(piece.side, Side::White);
+    assert_eq!(piece.position, Pos('a', 1));
 }

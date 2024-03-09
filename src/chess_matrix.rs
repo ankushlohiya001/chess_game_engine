@@ -1,13 +1,28 @@
-use std::char;
+use std::ops::RangeInclusive;
 
 use crate::{
     errors::GameError,
     pieces::{Character, Side},
 };
 
-#[derive(Debug, Clone, Copy)]
+const FILE_RANGE: RangeInclusive<u8> = ('a' as u8)..=('h' as u8);
+const RANK_RANGE: RangeInclusive<u8> = 1..=8;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Pos(pub char, pub u8);
 impl Pos {
+    pub fn new(file: char, rank: u8) -> Result<Pos, GameError> {
+        if Pos::is_valid(file, rank) {
+            Ok(Pos(file, rank))
+        } else {
+            Err(GameError::InvalidPosition)
+        }
+    }
+
+    fn is_valid(file: char, rank: u8) -> bool {
+        FILE_RANGE.contains(&(file as u8)) && RANK_RANGE.contains(&rank)
+    }
+
     pub fn rank(&self) -> u8 {
         self.1
     }
@@ -70,4 +85,20 @@ impl Default for ChessMatrix {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[test]
+fn pos_test() {
+    let pos = Pos('a', 1);
+    assert_eq!(pos.file(), 'a');
+    assert_eq!(pos.rank(), 1);
+
+    assert_eq!(pos.at_matrix(), (7, 0));
+
+    // unsafe position
+    let _pos = Pos('z', 100);
+
+    // safe position
+    let maybe_pos = Pos::new('z', 100);
+    assert_eq!(maybe_pos, Err(GameError::InvalidPosition));
 }
