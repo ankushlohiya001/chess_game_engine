@@ -20,7 +20,7 @@ impl Game {
         }
     }
 
-    fn place_characters(&mut self) {}
+    fn place_pieces(&mut self) {}
 
     pub fn start(&mut self) {
         self.start_with(Side::White);
@@ -28,7 +28,7 @@ impl Game {
 
     pub fn start_with(&mut self, side: Side) {
         self.side = side;
-        self.place_characters();
+        self.place_pieces();
     }
 
     pub fn whose_turn(&self) -> Side {

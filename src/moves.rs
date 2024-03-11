@@ -20,7 +20,44 @@ pub trait Moving {
     }
 }
 
-pub fn king_move(pos: Pos) -> Vec<Pos> {
+// pub fn king_move(pos: Pos) -> Vec<Pos> {
+//     let mut moves = Vec::with_capacity(9);
+//
+//     let file = pos.file();
+//     let rank = pos.rank();
+//
+//     for i in -1..2 {
+//         for j in -1..2 {
+//             let d_file = (file as i32 + i) as u8 as char;
+//             let d_rank = (rank as i32 + j) as u8;
+//             if !(d_file == file && d_rank == rank) && Pos::is_valid(d_file, d_rank) {
+//                 moves.push(Pos(d_file, d_rank));
+//             }
+//         }
+//     }
+//     moves
+// }
+
+pub fn cross_move(pos: Pos) -> Vec<Pos> {
     let mut moves = Vec::with_capacity(9);
+
+    let file = pos.file();
+    let rank = pos.rank();
+
+    for i in 1..=8 {
+        let d_file = (file as i32 + i) as u8 as char;
+        let d_rank = (rank as i32 + i) as u8;
+        if Pos::is_valid(d_file, d_rank) {
+            moves.push(Pos(d_file, d_rank));
+        }
+    }
+
     moves
+}
+
+#[test]
+fn test_moves() {
+    let moves = cross_move(Pos('a', 1));
+
+    assert_eq!(moves, vec![Pos('a', 2), Pos('b', 1), Pos('b', 2)]);
 }

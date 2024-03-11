@@ -19,7 +19,7 @@ impl Pos {
         }
     }
 
-    fn is_valid(file: char, rank: u8) -> bool {
+    pub fn is_valid(file: char, rank: u8) -> bool {
         FILE_RANGE.contains(&(file as u8)) && RANK_RANGE.contains(&rank)
     }
 
