@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
-use crate::errors::GameError;
-use crate::moves::{Moving, Pos};
+use crate::moves::{cross_move, plus_move, Moving, Pos};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Side {
@@ -52,7 +51,11 @@ impl Piece {
 
 impl Moving for Piece {
     fn possible_moves(&self) -> Vec<Pos> {
-        vec![]
+        match self.character {
+            Character::Bishop(_) => cross_move(self.position),
+            Character::Rook(_) => plus_move(self.position),
+            _ => vec![],
+        }
     }
 
     fn can_move(&self, new_pos: Pos) -> bool {

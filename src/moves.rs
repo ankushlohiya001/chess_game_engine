@@ -55,6 +55,15 @@ pub fn cross_move(pos: Pos) -> Vec<Pos> {
     moves
 }
 
+pub fn plus_move(pos: Pos) -> Vec<Pos> {
+    let mut moves = Vec::with_capacity(9);
+
+    let file = pos.file();
+    let rank = pos.rank();
+
+    moves
+}
+
 #[test]
 fn test_moves() {
     let moves = cross_move(Pos('a', 1));
