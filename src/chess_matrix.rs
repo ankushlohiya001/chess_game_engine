@@ -23,6 +23,17 @@ impl Pos {
         FILE_RANGE.contains(&(file as u8)) && RANK_RANGE.contains(&rank)
     }
 
+    pub fn d_pos(&self, d_file: i32, d_rank: i32) -> Result<Pos, ()> {
+        // need to refactor almost all stuff about this function
+        let new_file = (self.file() as i32 + d_file) as u8 as char;
+        let new_rank = (self.rank() as i32 + d_rank) as u8;
+        if Pos::is_valid(new_file, new_rank) {
+            Ok(Pos(new_file, new_rank))
+        } else {
+            Err(())
+        }
+    }
+
     pub fn rank(&self) -> u8 {
         self.1
     }

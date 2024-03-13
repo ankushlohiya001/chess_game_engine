@@ -20,53 +20,76 @@ pub trait Moving {
     }
 }
 
-// pub fn king_move(pos: Pos) -> Vec<Pos> {
-//     let mut moves = Vec::with_capacity(9);
-//
-//     let file = pos.file();
-//     let rank = pos.rank();
-//
-//     for i in -1..2 {
-//         for j in -1..2 {
-//             let d_file = (file as i32 + i) as u8 as char;
-//             let d_rank = (rank as i32 + j) as u8;
-//             if !(d_file == file && d_rank == rank) && Pos::is_valid(d_file, d_rank) {
-//                 moves.push(Pos(d_file, d_rank));
-//             }
-//         }
-//     }
-//     moves
-// }
+const CROSS_MAP: [(i32, i32); 4] = [(-1, -1), (-1, 1), (1, -1), (1, 1)];
 
-pub fn cross_move(pos: Pos) -> Vec<Pos> {
+pub fn cross_move(pos: Pos, infinite: bool) -> Vec<Pos> {
     let mut moves = Vec::with_capacity(9);
 
-    let file = pos.file();
-    let rank = pos.rank();
+    let max = if infinite { 8 } else { 1 };
 
-    for i in 1..=8 {
-        let d_file = (file as i32 + i) as u8 as char;
-        let d_rank = (rank as i32 + i) as u8;
-        if Pos::is_valid(d_file, d_rank) {
-            moves.push(Pos(d_file, d_rank));
+    for i in 1..=max {
+        for (d_file, d_rank) in CROSS_MAP {
+            if let Ok(pos) = pos.d_pos(d_file * i, d_rank * i) {
+                moves.push(pos);
+            }
         }
     }
 
     moves
 }
 
-pub fn plus_move(pos: Pos) -> Vec<Pos> {
+const PLUS_MAP: [(i32, i32); 4] = [(-1, 0), (0, -1), (0, 1), (1, 0)];
+
+pub fn plus_move(pos: Pos, infinite: bool) -> Vec<Pos> {
+    let mut moves = Vec::with_capacity(9);
+
+    let max = if infinite { 8 } else { 1 };
+
+    for i in 1..=max {
+        if let Ok(pos) = pos.d_pos(i) {
+            moves.push(pos);
+        }
+    }
+
+    moves
+}
+
+pub fn two_n_half_move(pos: Pos) -> Vec<Pos> {
     let mut moves = Vec::with_capacity(9);
 
     let file = pos.file();
     let rank = pos.rank();
+    moves
+}
 
+pub fn one_two_move(pos: Pos) -> Vec<Pos> {
+    let mut moves = Vec::with_capacity(9);
+
+    let file = pos.file();
+    let rank = pos.rank();
     moves
 }
 
 #[test]
 fn test_moves() {
-    let moves = cross_move(Pos('a', 1));
+    let moves = cross_move(Pos('d', 4), true);
 
-    assert_eq!(moves, vec![Pos('a', 2), Pos('b', 1), Pos('b', 2)]);
+    assert_eq!(
+        moves,
+        vec![
+            Pos('c', 3),
+            Pos('c', 5),
+            Pos('e', 3),
+            Pos('e', 5),
+            Pos('b', 2),
+            Pos('b', 6),
+            Pos('f', 2),
+            Pos('f', 6),
+            Pos('a', 1),
+            Pos('a', 7),
+            Pos('g', 1),
+            Pos('g', 7),
+            Pos('h', 8)
+        ]
+    );
 }

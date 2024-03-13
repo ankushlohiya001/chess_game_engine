@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::moves::{cross_move, plus_move, Moving, Pos};
+use crate::moves::{cross_move, one_two_move, plus_move, two_n_half_move, Moving, Pos};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Side {
@@ -52,14 +52,25 @@ impl Piece {
 impl Moving for Piece {
     fn possible_moves(&self) -> Vec<Pos> {
         match self.character {
-            Character::Bishop(_) => cross_move(self.position),
-            Character::Rook(_) => plus_move(self.position),
-            _ => vec![],
+            Character::Bishop(_) => cross_move(self.position, true),
+            Character::Rook(_) => plus_move(self.position, true),
+            Character::King(_) => {
+                let cross_s = cross_move(self.position, false);
+                let plus_s = plus_move(self.position, false);
+                [cross_s, plus_s].concat()
+            }
+            Character::Queen(_) => {
+                let cross_s = cross_move(self.position, true);
+                let plus_s = plus_move(self.position, true);
+                [cross_s, plus_s].concat()
+            }
+            Character::Knight(_) => two_n_half_move(self.position),
+            Character::Pawn(_) => one_two_move(self.position),
         }
     }
 
     fn can_move(&self, new_pos: Pos) -> bool {
-        true
+        self.possible_moves().contains(&new_pos)
     }
 }
 
