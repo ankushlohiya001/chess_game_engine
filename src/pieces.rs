@@ -1,6 +1,14 @@
 #![allow(dead_code)]
 
-use crate::moves::{cross_move, one_two_move, plus_move, two_n_half_move, Moving, Pos};
+use std::{cell::RefCell, mem};
+
+use crate::{
+    chess_board::ChessBoard,
+    errors::GameError,
+    game::{self, Game},
+    moves::{cross_move, one_two_move, plus_move, two_n_half_move, Moving, Pos},
+    pieces,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Side {
@@ -31,21 +39,48 @@ impl Character {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Piece {
     pub character: Character,
     pub position: Pos,
     pub side: Side,
+    surrounding: Option<RefCell<ChessBoard>>,
 }
 
 impl Piece {
-    pub fn new(character: Character, position: Pos) -> Self {
+    pub fn new(character: Character, position: Pos, surrounding: Option<ChessBoard>) -> Self {
         let side = character.side();
         Piece {
             character,
             position,
             side,
+            surrounding: surrounding.map(|a| RefCell::new(a)),
         }
+    }
+
+    pub fn new_alone(character: Character, position: Pos) -> Self {
+        Self::new(character, position, None)
+    }
+
+    pub fn place_at(&self, game: &mut Game, file: char, rank: u8) -> Result<(), GameError> {
+        let pos = Pos(file, rank);
+        if self.can_move(pos) {
+            if let Some(surrounding_ref) = self.surrounding {
+                let mut surrounding = surrounding_ref.borrow_mut();
+                let res = surrounding.place_character(self.character, pos);
+                game.board = *surrounding;
+                res
+            } else {
+                Err(GameError::AlonePiece)
+            }
+        } else {
+            Err(GameError::InvalidMove)
+        }
+    }
+
+    pub fn place_back(&mut self, game: &mut Game, piece: Piece) {
+        let pos = piece.position;
+        self.place_at(game, pos.file(), pos.rank()).unwrap();
     }
 }
 
@@ -76,8 +111,10 @@ impl Moving for Piece {
 
 #[test]
 fn piece_test() {
-    let piece = Piece::new(Character::King(Side::White), Pos('a', 1));
+    let piece = Piece::new_alone(Character::King(Side::White), Pos('a', 1));
 
     assert_eq!(piece.side, Side::White);
     assert_eq!(piece.position, Pos('a', 1));
+
+    assert!(piece.can_move(Pos('b', 2)));
 }

@@ -8,4 +8,5 @@ pub enum GameError {
     InvalidMove,
     GameOver,
     InvalidPosition,
+    AlonePiece,
 }

@@ -1,4 +1,4 @@
-pub mod chess_matrix;
+pub mod chess_board;
 pub mod errors;
 pub mod game;
 pub mod moves;

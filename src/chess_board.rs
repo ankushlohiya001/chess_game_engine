@@ -50,13 +50,14 @@ impl Pos {
     }
 }
 
-pub struct ChessMatrix {
+#[derive(Debug, Clone)]
+pub struct ChessBoard {
     matrix: [Option<Character>; 64],
 }
 
-impl ChessMatrix {
+impl ChessBoard {
     pub fn new() -> Self {
-        ChessMatrix { matrix: [None; 64] }
+        ChessBoard { matrix: [None; 64] }
     }
 
     fn index_from_rowcol(pos: Pos) -> usize {
@@ -65,14 +66,14 @@ impl ChessMatrix {
     }
 
     pub fn character_at(&self, pos: Pos) -> Option<Character> {
-        let index = ChessMatrix::index_from_rowcol(pos);
+        let index = ChessBoard::index_from_rowcol(pos);
         self.matrix[index]
     }
 
     pub fn pick_character(&mut self, pos: Pos) -> Result<Character, GameError> {
         if let Some(chracter) = self.character_at(pos) {
             // somehow replace these lines as are redundent
-            let index = ChessMatrix::index_from_rowcol(pos);
+            let index = ChessBoard::index_from_rowcol(pos);
             self.matrix[index] = None;
 
             Ok(chracter)
@@ -82,7 +83,7 @@ impl ChessMatrix {
     }
 
     pub fn place_character(&mut self, character: Character, pos: Pos) -> Result<(), GameError> {
-        let index = ChessMatrix::index_from_rowcol(pos);
+        let index = ChessBoard::index_from_rowcol(pos);
         if self.matrix[index].is_none() {
             self.matrix[index] = Some(character);
             Ok(())
@@ -92,7 +93,7 @@ impl ChessMatrix {
     }
 }
 
-impl Default for ChessMatrix {
+impl Default for ChessBoard {
     fn default() -> Self {
         Self::new()
     }

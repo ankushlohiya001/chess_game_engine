@@ -1,12 +1,14 @@
 #![allow(dead_code)]
 
-use crate::chess_matrix::{ChessMatrix, Pos};
+use std::mem;
+
+use crate::chess_board::{ChessBoard, Pos};
 use crate::errors::GameError;
 use crate::moves::Moving;
 use crate::pieces::{self, Character, Piece, Side};
 
 pub struct Game {
-    matrix: ChessMatrix,
+    pub board: ChessBoard,
     side: Side,
     move_done: bool,
 }
@@ -14,7 +16,7 @@ pub struct Game {
 impl Game {
     pub fn new() -> Game {
         Game {
-            matrix: ChessMatrix::new(),
+            board: ChessBoard::new(),
             side: Side::White,
             move_done: false,
         }
@@ -43,10 +45,10 @@ impl Game {
         // select a character / return an error
         if !self.move_done {
             let pos = Pos(file, rank);
-            let maybe_character = self.matrix.pick_character(pos);
+            let maybe_character = self.board.pick_character(pos);
             if let Ok(character) = maybe_character {
                 if character.side() == self.side {
-                    Ok(Piece::new(character, pos))
+                    Ok(Piece::new(character, pos, Some(mem::take(&mut self.board))))
                 } else {
                     // need to place back piece, do remember
                     Err(GameError::OpponentPiece)
@@ -57,20 +59,6 @@ impl Game {
         } else {
             Err(GameError::SideNotChanged)
         }
-    }
-
-    pub fn place(&mut self, piece: Piece, file: char, rank: u8) -> Result<(), GameError> {
-        let pos = Pos(file, rank);
-        if piece.can_move(pos) {
-            self.matrix.place_character(piece.character, pos)
-        } else {
-            Err(GameError::InvalidMove)
-        }
-    }
-
-    pub fn place_back(&mut self, piece: Piece) {
-        let pos = piece.position;
-        self.place(piece, pos.file(), pos.rank()).unwrap();
     }
 
     pub fn change_side(&mut self) -> Result<(), GameError> {
@@ -120,13 +108,13 @@ fn game_test() {
         assert_eq!(error, GameError::EmptyCell);
     }
 
-    let res = game.place(
-        Piece::new(Character::Pawn(Side::White), Pos('a', 1)),
-        'a',
-        2,
-    );
+    let piece = Piece::new_alone(Character::Pawn(Side::White), Pos('a', 1));
 
-    assert!(res.is_ok());
+    let res = piece.place_at(&mut game, 'b', 2);
+
+    println!("{:?}", res.err());
+
+    // assert!(res.is_ok());
 
     let maybe_piece = game.pick('a', 1);
     if let Err(error) = maybe_piece {
@@ -137,6 +125,11 @@ fn game_test() {
     assert!(maybe_piece.is_ok());
     let piece = maybe_piece.unwrap();
     assert_eq!(piece.position, Pos('a', 2));
+    let moves = piece.possible_moves();
+
+    println!("{:?}", moves);
+
+    assert_eq!(0, 1);
 }
 
 // somehow moves most piece related stuff to piece module,

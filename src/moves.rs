@@ -1,6 +1,6 @@
 use crate::errors::GameError;
 
-pub use crate::chess_matrix::Pos;
+pub use crate::chess_board::Pos;
 
 // TODOs
 // move manager can perform moves
@@ -46,9 +46,9 @@ pub fn plus_move(pos: Pos, infinite: bool) -> Vec<Pos> {
     let max = if infinite { 8 } else { 1 };
 
     for i in 1..=max {
-        if let Ok(pos) = pos.d_pos(i) {
-            moves.push(pos);
-        }
+        // if let Ok(pos) = pos.d_pos(i) {
+        //     moves.push(pos);
+        // }
     }
 
     moves
