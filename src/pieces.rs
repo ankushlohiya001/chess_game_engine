@@ -3,6 +3,7 @@
 use std::{cell::RefCell, mem, ops::DerefMut};
 
 use crate::{
+    characters,
     chess_board::ChessBoard,
     errors::GameError,
     game::{self, Game},
@@ -35,6 +36,31 @@ impl Character {
             Self::Rook(side) => side,
             Self::Bishop(side) => side,
             Self::Pawn(side) => side,
+        }
+    }
+
+    pub fn is_white(&self) -> bool {
+        self.side() == Side::White
+    }
+
+    pub fn is_black(&self) -> bool {
+        !self.is_white()
+    }
+
+    pub fn symbol(&self) -> char {
+        use characters::*;
+        let symbol = match self {
+            Self::King(_) => King,
+            Self::Queen(_) => Queen,
+            Self::Knight(_) => Knight,
+            Self::Rook(_) => Rook,
+            Self::Bishop(_) => Bishop,
+            Self::Pawn(_) => Pawn,
+        };
+        if self.is_white() {
+            symbol.0
+        } else {
+            symbol.1
         }
     }
 }
