@@ -1,3 +1,4 @@
+pub mod characters;
 pub mod chess_board;
 pub mod errors;
 pub mod game;
