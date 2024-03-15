@@ -98,7 +98,7 @@ impl ChessBoard {
             st.push(('0' as u8 + 8 - r) as char);
             st.push('|');
             let mut file = (0..8)
-                .map(|i| self.matrix[i].map_or(' ', |x| x.symbol()))
+                .map(|i| self.matrix[8 * r as usize + i].map_or(' ', |x| x.symbol()))
                 .fold(st, |mut st, c| {
                     st.push(c);
                     st.push('|');
@@ -143,6 +143,9 @@ fn pos_test() {
     assert_eq!(maybe_pos, Err(GameError::InvalidPosition));
 
     let mut board = ChessBoard::new();
+    board.place_character(Character::Pawn(Side::White), Pos('a', 1));
 
     board.show();
+
+    assert!(false);
 }
