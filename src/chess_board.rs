@@ -60,20 +60,20 @@ impl ChessBoard {
         ChessBoard { matrix: [None; 64] }
     }
 
-    fn index_from_rowcol(pos: Pos) -> usize {
+    fn index_from_pos(pos: Pos) -> usize {
         let (row, col) = pos.at_matrix();
         row * 8 + col
     }
 
     pub fn character_at(&self, pos: Pos) -> Option<Character> {
-        let index = ChessBoard::index_from_rowcol(pos);
+        let index = ChessBoard::index_from_pos(pos);
         self.matrix[index]
     }
 
     pub fn pick_character(&mut self, pos: Pos) -> Result<Character, GameError> {
         if let Some(chracter) = self.character_at(pos) {
             // somehow replace these lines as are redundent
-            let index = ChessBoard::index_from_rowcol(pos);
+            let index = ChessBoard::index_from_pos(pos);
             self.matrix[index] = None;
 
             Ok(chracter)
@@ -83,13 +83,41 @@ impl ChessBoard {
     }
 
     pub fn place_character(&mut self, character: Character, pos: Pos) -> Result<(), GameError> {
-        let index = ChessBoard::index_from_rowcol(pos);
+        let index = ChessBoard::index_from_pos(pos);
         if self.matrix[index].is_none() {
             self.matrix[index] = Some(character);
             Ok(())
         } else {
             Err(GameError::OccupiedCell)
         }
+    }
+
+    pub fn show(&self) {
+        // don't read this code :DD
+        let mut board_str = (0..8).fold(String::new(), |mut st, r| {
+            st.push(('0' as u8 + 8 - r) as char);
+            st.push('|');
+            let mut file = (0..8)
+                .map(|i| self.matrix[i].map_or(' ', |x| x.symbol()))
+                .fold(st, |mut st, c| {
+                    st.push(c);
+                    st.push('|');
+                    st
+                });
+
+            file.push('\n');
+            file
+        });
+
+        board_str.push_str("  ");
+        let files = (0..8)
+            .map(|x| ('a' as u8 + x) as char)
+            .fold(board_str, |mut st, c| {
+                st.push(c);
+                st.push(' ');
+                st
+            });
+        println!("{}", files);
     }
 }
 
@@ -113,4 +141,17 @@ fn pos_test() {
     // safe position
     let maybe_pos = Pos::new('z', 100);
     assert_eq!(maybe_pos, Err(GameError::InvalidPosition));
+
+    let mut board = ChessBoard::new();
+
+    for i in 1..=8 {
+        board.place_character(Character::King(Side::White), Pos('a', i));
+        board.place_character(Character::King(Side::Black), Pos('b', i));
+        board.place_character(Character::Queen(Side::White), Pos('c', i));
+        board.place_character(Character::Queen(Side::Black), Pos('d', i));
+    }
+
+    board.show();
+
+    assert!(false);
 }
