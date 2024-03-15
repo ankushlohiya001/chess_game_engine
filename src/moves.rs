@@ -39,10 +39,11 @@ pub fn cross_move(piece: &Piece, infinite: bool) -> Vec<Pos> {
         for (index, (d_file, d_rank)) in dirs.iter().enumerate() {
             if let Ok(pos) = pos.d_pos(d_file * i, d_rank * i) {
                 if let Some(nei) = surounding.character_at(pos) {
-                    if Character::same_side(&piece.character, &nei) {
-                        dirs.remove(index);
-                        break;
+                    if !Character::same_side(&piece.character, &nei) {
+                        moves.push(pos);
                     }
+                    dirs.remove(index);
+                    break;
                 }
                 moves.push(pos);
             }
