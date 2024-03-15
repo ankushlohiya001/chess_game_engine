@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::{cell::RefCell, mem};
+use std::{cell::RefCell, mem, ops::DerefMut};
 
 use crate::{
     chess_board::ChessBoard,
@@ -54,7 +54,7 @@ impl Piece {
             character,
             position,
             side,
-            surrounding: surrounding.map(|a| RefCell::new(a)),
+            surrounding: surrounding.map(RefCell::new),
         }
     }
 
@@ -65,10 +65,10 @@ impl Piece {
     pub fn place_at(&self, game: &mut Game, file: char, rank: u8) -> Result<(), GameError> {
         let pos = Pos(file, rank);
         if self.can_move(pos) {
-            if let Some(surrounding_ref) = self.surrounding {
+            if let Some(ref surrounding_ref) = self.surrounding {
                 let mut surrounding = surrounding_ref.borrow_mut();
                 let res = surrounding.place_character(self.character, pos);
-                game.board = *surrounding;
+                game.board = mem::take(surrounding.deref_mut());
                 res
             } else {
                 Err(GameError::AlonePiece)
@@ -78,8 +78,8 @@ impl Piece {
         }
     }
 
-    pub fn place_back(&mut self, game: &mut Game, piece: Piece) {
-        let pos = piece.position;
+    pub fn place_back(&self, game: &mut Game) {
+        let pos = self.position;
         self.place_at(game, pos.file(), pos.rank()).unwrap();
     }
 }

@@ -47,10 +47,11 @@ impl Game {
             let pos = Pos(file, rank);
             let maybe_character = self.board.pick_character(pos);
             if let Ok(character) = maybe_character {
+                let piece = Piece::new(character, pos, Some(mem::take(&mut self.board)));
                 if character.side() == self.side {
-                    Ok(Piece::new(character, pos, Some(mem::take(&mut self.board))))
+                    Ok(piece)
                 } else {
-                    // need to place back piece, do remember
+                    piece.place_back(self);
                     Err(GameError::OpponentPiece)
                 }
             } else {
