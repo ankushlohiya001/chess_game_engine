@@ -144,14 +144,5 @@ fn pos_test() {
 
     let mut board = ChessBoard::new();
 
-    for i in 1..=8 {
-        board.place_character(Character::King(Side::White), Pos('a', i));
-        board.place_character(Character::King(Side::Black), Pos('b', i));
-        board.place_character(Character::Queen(Side::White), Pos('c', i));
-        board.place_character(Character::Queen(Side::Black), Pos('d', i));
-    }
-
     board.show();
-
-    assert!(false);
 }

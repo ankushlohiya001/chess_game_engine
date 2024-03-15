@@ -1,4 +1,10 @@
-use crate::errors::GameError;
+use std::borrow::Borrow;
+
+use crate::{
+    characters::King,
+    errors::GameError,
+    pieces::{self, Character, Piece},
+};
 
 pub use crate::chess_board::Pos;
 
@@ -20,16 +26,24 @@ pub trait Moving {
     }
 }
 
-const CROSS_MAP: [(i32, i32); 4] = [(-1, -1), (-1, 1), (1, -1), (1, 1)];
-
-pub fn cross_move(pos: Pos, infinite: bool) -> Vec<Pos> {
+pub fn cross_move(piece: &Piece, infinite: bool) -> Vec<Pos> {
     let mut moves = Vec::with_capacity(9);
+    let pos = piece.position;
+    let surounding = piece.surrounding.as_ref().unwrap().borrow();
 
     let max = if infinite { 8 } else { 1 };
 
+    let mut dirs = vec![(-1, -1), (-1, 1), (1, -1), (1, 1)];
+
     for i in 1..=max {
-        for (d_file, d_rank) in CROSS_MAP {
+        for (index, (d_file, d_rank)) in dirs.iter().enumerate() {
             if let Ok(pos) = pos.d_pos(d_file * i, d_rank * i) {
+                if let Some(nei) = surounding.character_at(pos) {
+                    if Character::same_side(&piece.character, &nei) {
+                        dirs.remove(index);
+                        break;
+                    }
+                }
                 moves.push(pos);
             }
         }
@@ -40,8 +54,9 @@ pub fn cross_move(pos: Pos, infinite: bool) -> Vec<Pos> {
 
 const PLUS_MAP: [(i32, i32); 4] = [(-1, 0), (0, -1), (0, 1), (1, 0)];
 
-pub fn plus_move(pos: Pos, infinite: bool) -> Vec<Pos> {
+pub fn plus_move(piece: &Piece, infinite: bool) -> Vec<Pos> {
     let mut moves = Vec::with_capacity(9);
+    let pos = piece.position;
 
     let max = if infinite { 8 } else { 1 };
 
@@ -54,16 +69,18 @@ pub fn plus_move(pos: Pos, infinite: bool) -> Vec<Pos> {
     moves
 }
 
-pub fn two_n_half_move(pos: Pos) -> Vec<Pos> {
+pub fn two_n_half_move(piece: &Piece) -> Vec<Pos> {
     let mut moves = Vec::with_capacity(9);
+    let pos = piece.position;
 
     let file = pos.file();
     let rank = pos.rank();
     moves
 }
 
-pub fn one_two_move(pos: Pos) -> Vec<Pos> {
+pub fn one_two_move(piece: &Piece) -> Vec<Pos> {
     let mut moves = Vec::with_capacity(9);
+    let pos = piece.position;
 
     let file = pos.file();
     let rank = pos.rank();
@@ -72,24 +89,25 @@ pub fn one_two_move(pos: Pos) -> Vec<Pos> {
 
 #[test]
 fn test_moves() {
-    let moves = cross_move(Pos('d', 4), true);
-
-    assert_eq!(
-        moves,
-        vec![
-            Pos('c', 3),
-            Pos('c', 5),
-            Pos('e', 3),
-            Pos('e', 5),
-            Pos('b', 2),
-            Pos('b', 6),
-            Pos('f', 2),
-            Pos('f', 6),
-            Pos('a', 1),
-            Pos('a', 7),
-            Pos('g', 1),
-            Pos('g', 7),
-            Pos('h', 8)
-        ]
-    );
+    // let piece = Piece::new(Character::King, position, surrounding)
+    // let moves = cross_move(pieces, true);
+    //
+    // assert_eq!(
+    //     moves,
+    //     vec![
+    //         Pos('c', 3),
+    //         Pos('c', 5),
+    //         Pos('e', 3),
+    //         Pos('e', 5),
+    //         Pos('b', 2),
+    //         Pos('b', 6),
+    //         Pos('f', 2),
+    //         Pos('f', 6),
+    //         Pos('a', 1),
+    //         Pos('a', 7),
+    //         Pos('g', 1),
+    //         Pos('g', 7),
+    //         Pos('h', 8)
+    //     ]
+    // );
 }

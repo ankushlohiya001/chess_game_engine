@@ -63,6 +63,10 @@ impl Character {
             symbol.1
         }
     }
+
+    pub fn same_side(character_a: &Character, character_b: &Character) -> bool {
+        character_a.side() == character_b.side()
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -70,7 +74,7 @@ pub struct Piece {
     pub character: Character,
     pub position: Pos,
     pub side: Side,
-    surrounding: Option<RefCell<ChessBoard>>,
+    pub surrounding: Option<RefCell<ChessBoard>>,
 }
 
 impl Piece {
@@ -86,6 +90,10 @@ impl Piece {
 
     pub fn new_alone(character: Character, position: Pos) -> Self {
         Self::new(character, position, None)
+    }
+
+    pub fn same_side(piece_a: &Piece, piece_b: &Piece) -> bool {
+        piece_a.side == piece_b.side
     }
 
     pub fn place_at(&self, game: &mut Game, file: char, rank: u8) -> Result<(), GameError> {
@@ -113,20 +121,20 @@ impl Piece {
 impl Moving for Piece {
     fn possible_moves(&self) -> Vec<Pos> {
         match self.character {
-            Character::Bishop(_) => cross_move(self.position, true),
-            Character::Rook(_) => plus_move(self.position, true),
+            Character::Bishop(_) => cross_move(self, true),
+            Character::Rook(_) => plus_move(self, true),
             Character::King(_) => {
-                let cross_s = cross_move(self.position, false);
-                let plus_s = plus_move(self.position, false);
+                let cross_s = cross_move(self, false);
+                let plus_s = plus_move(self, false);
                 [cross_s, plus_s].concat()
             }
             Character::Queen(_) => {
-                let cross_s = cross_move(self.position, true);
-                let plus_s = plus_move(self.position, true);
+                let cross_s = cross_move(self, true);
+                let plus_s = plus_move(self, true);
                 [cross_s, plus_s].concat()
             }
-            Character::Knight(_) => two_n_half_move(self.position),
-            Character::Pawn(_) => one_two_move(self.position),
+            Character::Knight(_) => two_n_half_move(self),
+            Character::Pawn(_) => one_two_move(self),
         }
     }
 
