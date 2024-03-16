@@ -144,13 +144,13 @@ fn pos_test() {
     assert_eq!(maybe_pos, Err(GameError::InvalidPosition));
 
     let mut board = ChessBoard::new();
-    board.place_character(Character::Bishop(Side::White), Pos('a', 1));
-    board.place_character(Character::Bishop(Side::White), Pos('f', 6));
+    board.place_character(Character::Bishop(Side::White), Pos('d', 4));
+    board.place_character(Character::Bishop(Side::Black), Pos('f', 6));
 
     board.show();
 
-    let character = board.pick_character(Pos('a', 1)).unwrap();
-    let piece = Piece::new(character, Pos('a', 1), Some(board));
+    let character = board.pick_character(Pos('d', 4)).unwrap();
+    let piece = Piece::new(character, Pos('d', 4), Some(board));
 
     println!("{:?}", piece.possible_moves());
 

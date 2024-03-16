@@ -1,13 +1,13 @@
 #![allow(dead_code)]
 
-use std::{cell::RefCell, mem, ops::DerefMut};
+use std::{borrow::BorrowMut, cell::RefCell, mem, ops::DerefMut};
 
 use crate::{
     characters,
     chess_board::ChessBoard,
     errors::GameError,
     game::{self, Game},
-    moves::{cross_move, one_two_move, plus_move, two_n_half_move, Moving, Pos},
+    moves::{Moving, Pos},
     pieces,
 };
 
@@ -119,23 +119,16 @@ impl Piece {
 }
 
 impl Moving for Piece {
-    fn possible_moves(&self) -> Vec<Pos> {
-        match self.character {
-            Character::Bishop(_) => cross_move(self, true),
-            Character::Rook(_) => plus_move(self, true),
-            Character::King(_) => {
-                let cross_s = cross_move(self, false);
-                let plus_s = plus_move(self, false);
-                [cross_s, plus_s].concat()
-            }
-            Character::Queen(_) => {
-                let cross_s = cross_move(self, true);
-                let plus_s = plus_move(self, true);
-                [cross_s, plus_s].concat()
-            }
-            Character::Knight(_) => two_n_half_move(self),
-            Character::Pawn(_) => one_two_move(self),
-        }
+    fn character(&self) -> Character {
+        self.character
+    }
+
+    fn current_position(&self) -> Pos {
+        self.position
+    }
+
+    fn surrounding(&self) -> &mut ChessBoard {
+        self.surrounding.as_ref().unwrap().get_mut()
     }
 
     fn can_move(&self, new_pos: Pos) -> bool {

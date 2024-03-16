@@ -1,12 +1,46 @@
-use std::borrow::Borrow;
-
 use crate::{
-    characters::King,
+    characters::{
+        Bishop_Move, King_Move, Knight_Move, Pawn_First_Move, Pawn_Move, Queen_Move, Rook_Move,
+    },
+    chess_board::ChessBoard,
     errors::GameError,
-    pieces::{self, Character, Piece},
+    pieces::Character,
 };
 
 pub use crate::chess_board::Pos;
+
+pub mod dirs {
+    pub type Dir = (i32, i32);
+
+    pub const TOP_LEFT: Dir = (-1, 1);
+    pub const TOP: Dir = (0, 1);
+    pub const TOP_RIGHT: Dir = (1, 1);
+
+    pub const MID_LEFT: Dir = (-1, 0);
+    pub const MID: Dir = (0, 0);
+    pub const MID_RIGHT: Dir = (1, 0);
+
+    pub const BOT_LEFT: Dir = (-1, -1);
+    pub const BOT: Dir = (0, -1);
+    pub const BOT_RIGHT: Dir = (1, -1);
+
+    pub const TWO_TOP_LEFT: Dir = (-1, 2);
+    pub const TWO_TOP_RIGHT: Dir = (1, 2);
+
+    pub const TWO_LEFT_TOP: Dir = (-2, 1);
+    pub const TWO_LEFT_BOT: Dir = (-2, -1);
+
+    pub const TWO_RIGHT_TOP: Dir = (2, 1);
+    pub const TWO_RIGHT_BOT: Dir = (2, -1);
+
+    pub const TWO_BOT_LEFT: Dir = (-1, -2);
+    pub const TWO_BOT_RIGHT: Dir = (1, -2);
+
+    pub const TWO_TOP: Dir = (0, 2);
+
+    pub const ONE_TOP_LEFT: Dir = (-1, 1);
+    pub const ONE_TOP_RIGHT: Dir = (1, 1);
+}
 
 // TODOs
 // move manager can perform moves
@@ -15,100 +49,78 @@ pub use crate::chess_board::Pos;
 //      Kg4, moving King to g4
 //
 // also records so as to perform undos/redos
-
 pub trait Moving {
-    fn possible_moves(&self) -> Vec<Pos>;
+    fn character(&self) -> Character;
+
+    fn current_position(&self) -> Pos;
+
+    fn surrounding(&self) -> &mut ChessBoard;
+
+    fn possible_moves(&self) -> Vec<Pos> {
+        match self.character() {
+            Character::Bishop(_) => {
+                let dirs = Bishop_Move.clone();
+                self.move_maker(dirs, true)
+            }
+            Character::Queen(_) => {
+                let dirs = Queen_Move.clone();
+                self.move_maker(dirs, true)
+            }
+            Character::Rook(_) => {
+                let dirs = Rook_Move.clone();
+                self.move_maker(dirs, true)
+            }
+            Character::Knight(_) => {
+                let dirs = Knight_Move.clone();
+                self.move_maker(dirs, false)
+            }
+            Character::King(_) => {
+                let dirs = King_Move.clone();
+                self.move_maker(dirs, false)
+            }
+            Character::Pawn(_) => {
+                let rank = self.current_position().rank();
+                let dirs = if rank == 2 || rank == 7 {
+                    Pawn_First_Move.clone()
+                } else {
+                    Pawn_Move.clone()
+                };
+                self.move_maker(dirs, false)
+            }
+        }
+    }
 
     fn can_move(&self, new_pos: Pos) -> bool;
 
     fn move_to(&mut self, new_pos: Pos) -> Result<(), GameError> {
         Err(GameError::InvalidMove)
     }
-}
 
-pub fn cross_move(piece: &Piece, infinite: bool) -> Vec<Pos> {
-    let mut moves = Vec::with_capacity(9);
-    let pos = piece.position;
-    let surounding = piece.surrounding.as_ref().unwrap().borrow();
+    fn move_maker(&self, mut dirs: Vec<dirs::Dir>, infinite: bool) -> Vec<Pos> {
+        let mut moves = Vec::with_capacity(9);
+        let pos = self.current_position();
+        let surounding = self.surrounding();
 
-    let max = if infinite { 8 } else { 1 };
+        let max = if infinite { 8 } else { 1 };
 
-    let mut dirs = vec![(-1, -1), (-1, 1), (1, -1), (1, 1)];
-
-    for i in 1..=max {
-        for (index, (d_file, d_rank)) in dirs.iter().enumerate() {
-            if let Ok(pos) = pos.d_pos(d_file * i, d_rank * i) {
-                if let Some(nei) = surounding.character_at(pos) {
-                    if !Character::same_side(&piece.character, &nei) {
-                        moves.push(pos);
+        for i in 1..=max {
+            for (index, (d_file, d_rank)) in dirs.iter().enumerate() {
+                if let Ok(pos) = pos.d_pos(d_file * i, d_rank * i) {
+                    if let Some(nei) = surounding.character_at(pos) {
+                        if !Character::same_side(&self.character(), &nei) {
+                            moves.push(pos);
+                        }
+                        dirs.remove(index);
+                        break;
                     }
-                    dirs.remove(index);
-                    break;
+                    moves.push(pos);
                 }
-                moves.push(pos);
             }
         }
+
+        moves
     }
-
-    moves
-}
-
-const PLUS_MAP: [(i32, i32); 4] = [(-1, 0), (0, -1), (0, 1), (1, 0)];
-
-pub fn plus_move(piece: &Piece, infinite: bool) -> Vec<Pos> {
-    let mut moves = Vec::with_capacity(9);
-    let pos = piece.position;
-
-    let max = if infinite { 8 } else { 1 };
-
-    for i in 1..=max {
-        // if let Ok(pos) = pos.d_pos(i) {
-        //     moves.push(pos);
-        // }
-    }
-
-    moves
-}
-
-pub fn two_n_half_move(piece: &Piece) -> Vec<Pos> {
-    let mut moves = Vec::with_capacity(9);
-    let pos = piece.position;
-
-    let file = pos.file();
-    let rank = pos.rank();
-    moves
-}
-
-pub fn one_two_move(piece: &Piece) -> Vec<Pos> {
-    let mut moves = Vec::with_capacity(9);
-    let pos = piece.position;
-
-    let file = pos.file();
-    let rank = pos.rank();
-    moves
 }
 
 #[test]
-fn test_moves() {
-    // let piece = Piece::new(Character::King, position, surrounding)
-    // let moves = cross_move(pieces, true);
-    //
-    // assert_eq!(
-    //     moves,
-    //     vec![
-    //         Pos('c', 3),
-    //         Pos('c', 5),
-    //         Pos('e', 3),
-    //         Pos('e', 5),
-    //         Pos('b', 2),
-    //         Pos('b', 6),
-    //         Pos('f', 2),
-    //         Pos('f', 6),
-    //         Pos('a', 1),
-    //         Pos('a', 7),
-    //         Pos('g', 1),
-    //         Pos('g', 7),
-    //         Pos('h', 8)
-    //     ]
-    // );
-}
+fn test_moves() {}
