@@ -1,14 +1,13 @@
 #![allow(dead_code)]
 
-use std::{borrow::BorrowMut, cell::RefCell, mem, ops::DerefMut};
+use std::{cell::RefCell, mem, ops::DerefMut};
 
 use crate::{
     characters,
     chess_board::ChessBoard,
     errors::GameError,
-    game::{self, Game},
+    game::Game,
     moves::{Moving, Pos},
-    pieces,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,7 +47,7 @@ impl Character {
     }
 
     pub fn symbol(&self) -> char {
-        use characters::*;
+        use characters::symbols::*;
         let symbol = match self {
             Self::King(_) => King,
             Self::Queen(_) => Queen,
@@ -127,8 +126,8 @@ impl Moving for Piece {
         self.position
     }
 
-    fn surrounding(&self) -> &mut ChessBoard {
-        self.surrounding.as_ref().unwrap().get_mut()
+    fn surrounding(&self) -> std::cell::RefMut<'_, ChessBoard> {
+        self.surrounding.as_ref().unwrap().borrow_mut()
     }
 
     fn can_move(&self, new_pos: Pos) -> bool {

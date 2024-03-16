@@ -5,7 +5,8 @@ use std::mem;
 use crate::chess_board::{ChessBoard, Pos};
 use crate::errors::GameError;
 use crate::moves::Moving;
-use crate::pieces::{self, Character, Piece, Side};
+use crate::pieces::Character;
+use crate::pieces::{Piece, Side};
 
 pub struct Game {
     pub board: ChessBoard,
@@ -22,7 +23,9 @@ impl Game {
         }
     }
 
-    fn place_pieces(&mut self) {}
+    fn place_pieces(&mut self) {
+        self.board.place_character_init();
+    }
 
     pub fn start(&mut self) {
         self.start_with(Side::White);
@@ -38,7 +41,7 @@ impl Game {
     }
 
     pub fn show_board(&self) {
-        todo!("somehow show board to user")
+        self.board.show();
     }
 
     pub fn pick(&mut self, file: char, rank: u8) -> Result<Piece, GameError> {

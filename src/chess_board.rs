@@ -1,6 +1,7 @@
 use std::ops::RangeInclusive;
 
 use crate::{
+    characters::positions,
     errors::GameError,
     moves::Moving,
     pieces::{Character, Piece, Side},
@@ -64,6 +65,62 @@ impl ChessBoard {
     fn index_from_pos(pos: Pos) -> usize {
         let (row, col) = pos.at_matrix();
         row * 8 + col
+    }
+
+    pub fn place_character_init(&mut self) {
+        for pos in positions::Bishop {
+            let side = if pos.rank() < 4 {
+                Side::White
+            } else {
+                Side::Black
+            };
+            self.place_character(Character::Bishop(side), pos);
+        }
+
+        for pos in positions::Rook {
+            let side = if pos.rank() < 4 {
+                Side::White
+            } else {
+                Side::Black
+            };
+            self.place_character(Character::Rook(side), pos);
+        }
+
+        for pos in positions::Knight {
+            let side = if pos.rank() < 4 {
+                Side::White
+            } else {
+                Side::Black
+            };
+            self.place_character(Character::Knight(side), pos);
+        }
+
+        for pos in positions::King {
+            let side = if pos.rank() < 4 {
+                Side::White
+            } else {
+                Side::Black
+            };
+            self.place_character(Character::King(side), pos);
+        }
+
+        for pos in positions::Queen {
+            let side = if pos.rank() < 4 {
+                Side::White
+            } else {
+                Side::Black
+            };
+            self.place_character(Character::Queen(side), pos);
+        }
+
+        for pos in positions::Pawn {
+            let side = if pos.rank() < 4 {
+                Side::White
+            } else {
+                Side::Black
+            };
+            self.place_character(Character::Pawn(side), pos);
+        }
     }
 
     pub fn character_at(&self, pos: Pos) -> Option<Character> {
@@ -144,15 +201,9 @@ fn pos_test() {
     assert_eq!(maybe_pos, Err(GameError::InvalidPosition));
 
     let mut board = ChessBoard::new();
-    board.place_character(Character::Bishop(Side::White), Pos('d', 4));
-    board.place_character(Character::Bishop(Side::Black), Pos('f', 6));
+    board.place_character_init();
 
     board.show();
-
-    let character = board.pick_character(Pos('d', 4)).unwrap();
-    let piece = Piece::new(character, Pos('d', 4), Some(board));
-
-    println!("{:?}", piece.possible_moves());
 
     assert!(false);
 }

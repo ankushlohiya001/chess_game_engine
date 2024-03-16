@@ -1,11 +1,4 @@
-use crate::{
-    characters::{
-        Bishop_Move, King_Move, Knight_Move, Pawn_First_Move, Pawn_Move, Queen_Move, Rook_Move,
-    },
-    chess_board::ChessBoard,
-    errors::GameError,
-    pieces::Character,
-};
+use crate::{characters::moves, chess_board::ChessBoard, errors::GameError, pieces::Character};
 
 pub use crate::chess_board::Pos;
 
@@ -54,36 +47,36 @@ pub trait Moving {
 
     fn current_position(&self) -> Pos;
 
-    fn surrounding(&self) -> &mut ChessBoard;
+    fn surrounding(&self) -> std::cell::RefMut<'_, ChessBoard>;
 
     fn possible_moves(&self) -> Vec<Pos> {
         match self.character() {
             Character::Bishop(_) => {
-                let dirs = Bishop_Move.clone();
+                let dirs = moves::Bishop.to_vec();
                 self.move_maker(dirs, true)
             }
             Character::Queen(_) => {
-                let dirs = Queen_Move.clone();
+                let dirs = moves::Queen.to_vec();
                 self.move_maker(dirs, true)
             }
             Character::Rook(_) => {
-                let dirs = Rook_Move.clone();
+                let dirs = moves::Rook.to_vec();
                 self.move_maker(dirs, true)
             }
             Character::Knight(_) => {
-                let dirs = Knight_Move.clone();
+                let dirs = moves::Knight.to_vec();
                 self.move_maker(dirs, false)
             }
             Character::King(_) => {
-                let dirs = King_Move.clone();
+                let dirs = moves::King.to_vec();
                 self.move_maker(dirs, false)
             }
             Character::Pawn(_) => {
                 let rank = self.current_position().rank();
                 let dirs = if rank == 2 || rank == 7 {
-                    Pawn_First_Move.clone()
+                    moves::Pawn_First.to_vec()
                 } else {
-                    Pawn_Move.clone()
+                    moves::Pawn.to_vec()
                 };
                 self.move_maker(dirs, false)
             }
@@ -91,10 +84,6 @@ pub trait Moving {
     }
 
     fn can_move(&self, new_pos: Pos) -> bool;
-
-    fn move_to(&mut self, new_pos: Pos) -> Result<(), GameError> {
-        Err(GameError::InvalidMove)
-    }
 
     fn move_maker(&self, mut dirs: Vec<dirs::Dir>, infinite: bool) -> Vec<Pos> {
         let mut moves = Vec::with_capacity(9);
