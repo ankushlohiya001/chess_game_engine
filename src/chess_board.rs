@@ -204,6 +204,10 @@ fn pos_test() {
     board.place_character_init();
 
     board.show();
+    let chars = board.pick_character(Pos('b', 1)).unwrap();
+    let pieces = Piece::new(chars, Pos('b', 1), Some(board));
+    let moves = pieces.possible_moves();
+    println!("{:?}", moves);
 
     assert!(false);
 }
