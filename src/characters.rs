@@ -45,12 +45,12 @@ pub mod positions {
 pub mod moves {
     use crate::moves::dirs::*;
 
-    pub const King: [Dir; 9] = [
-        TOP_LEFT, TOP, TOP_RIGHT, MID_LEFT, MID, MID_RIGHT, BOT_LEFT, BOT, BOT_RIGHT,
+    pub const King: [Dir; 8] = [
+        TOP_LEFT, TOP, TOP_RIGHT, MID_LEFT, MID_RIGHT, BOT_LEFT, BOT, BOT_RIGHT,
     ];
 
-    pub const Queen: [Dir; 9] = [
-        TOP_LEFT, TOP, TOP_RIGHT, MID_LEFT, MID, MID_RIGHT, BOT_LEFT, BOT, BOT_RIGHT,
+    pub const Queen: [Dir; 8] = [
+        TOP_LEFT, TOP, TOP_RIGHT, MID_LEFT, MID_RIGHT, BOT_LEFT, BOT, BOT_RIGHT,
     ];
 
     pub const Rook: [Dir; 4] = [TOP, MID_RIGHT, BOT, MID_LEFT];

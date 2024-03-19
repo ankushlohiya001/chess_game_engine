@@ -88,23 +88,26 @@ pub trait Moving {
 
     fn can_move(&self, new_pos: Pos) -> bool;
 
-    fn move_maker(&self, mut dirs: Vec<dirs::Dir>, infinite: bool) -> Vec<Pos> {
-        let gen_condition = |maybeCharacter| -> (bool, bool) {
-            if let Some(nei) = maybeCharacter {
-                (!Character::same_side(&self.character(), &nei), true)
-            } else {
-                (false, false)
-            }
-        };
+    fn general_condition(
+        current_character: Character,
+        maybe_character: Option<Character>,
+    ) -> (bool, bool) {
+        if let Some(nei) = maybe_character {
+            (!Character::same_side(&current_character, &nei), true)
+        } else {
+            (true, false)
+        }
+    }
 
-        self.dirs_traverser(dirs, infinite, gen_condition)
+    fn move_maker(&self, dirs: Vec<dirs::Dir>, infinite: bool) -> Vec<Pos> {
+        self.dirs_traverser(dirs, infinite, <Self as Moving>::general_condition)
     }
 
     fn dirs_traverser(
         &self,
         mut dirs: Vec<dirs::Dir>,
         infinite: bool,
-        adding_condition: impl Fn(Option<Character>) -> (bool, bool),
+        adding_condition: impl Fn(Character, Option<Character>) -> (bool, bool),
     ) -> Vec<Pos> {
         let mut moves = Vec::with_capacity(9);
         let pos = self.current_position();
@@ -113,17 +116,27 @@ pub trait Moving {
         let max = if infinite { 8 } else { 1 };
 
         for i in 1..=max {
+            let mut to_remove = Vec::new();
             for (index, (d_file, d_rank)) in dirs.iter().enumerate() {
                 if let Ok(pos) = pos.d_pos(d_file * i, d_rank * i) {
                     let maybe_character = surounding.character_at(pos);
-                    let (is_valid_pos, stop_here) = adding_condition(maybe_character);
+                    let (is_valid_pos, stop_here) =
+                        adding_condition(self.character(), maybe_character);
                     if is_valid_pos {
                         moves.push(pos);
                     }
                     if stop_here {
-                        dirs.remove(index);
-                        break;
+                        to_remove.push(index);
                     }
+                } else {
+                    to_remove.push(index);
+                }
+            }
+            if infinite {
+                to_remove.reverse();
+                // just to preserve unneccasory iterations
+                for index in to_remove {
+                    dirs.remove(index);
                 }
             }
         }

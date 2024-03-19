@@ -1,4 +1,4 @@
-use std::ops::RangeInclusive;
+use std::{fmt::Debug, ops::RangeInclusive};
 
 use crate::{
     characters::positions,
@@ -10,7 +10,7 @@ use crate::{
 const FILE_RANGE: RangeInclusive<u8> = ('a' as u8)..=('h' as u8);
 const RANK_RANGE: RangeInclusive<u8> = 1..=8;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Pos(pub char, pub u8);
 impl Pos {
     pub fn new(file: char, rank: u8) -> Result<Pos, GameError> {
@@ -49,6 +49,12 @@ impl Pos {
             (8 - self.rank()) as usize,
             self.file() as usize - 'a' as usize,
         )
+    }
+}
+
+impl Debug for Pos {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}{}", self.file(), self.rank())
     }
 }
 
@@ -201,13 +207,15 @@ fn pos_test() {
     assert_eq!(maybe_pos, Err(GameError::InvalidPosition));
 
     let mut board = ChessBoard::new();
-    board.place_character_init();
+    // board.place_character_init();
+    board.place_character(Character::Bishop(Side::White), Pos('d', 4));
+    board.place_character(Character::Pawn(Side::Black), Pos('c', 5));
 
     board.show();
-    let chars = board.pick_character(Pos('b', 1)).unwrap();
-    let pieces = Piece::new(chars, Pos('b', 1), Some(board));
+    let chars = board.pick_character(Pos('d', 4)).unwrap();
+    let pieces = Piece::new(chars, Pos('d', 4), Some(board));
     let moves = pieces.possible_moves();
-    println!("{:?}", moves);
+    println!("{:#?}", moves);
 
     assert!(false);
 }
