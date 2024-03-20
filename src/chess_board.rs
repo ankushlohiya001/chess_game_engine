@@ -215,6 +215,4 @@ fn pos_test() {
     let pieces = Piece::new(chars, Pos('c', 2), Some(board));
     let moves = pieces.possible_moves();
     println!("{:#?}", moves);
-
-    assert!(false);
 }

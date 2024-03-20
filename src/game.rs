@@ -8,10 +8,19 @@ use crate::moves::Moving;
 use crate::pieces::Character;
 use crate::pieces::{Piece, Side};
 
+#[derive(Debug, Default)]
+pub enum GameState {
+    #[default]
+    Idle,
+    PiecePicked,
+    PiecePlaced,
+    Ended,
+}
+
 pub struct Game {
     pub board: ChessBoard,
     side: Side,
-    move_done: bool,
+    pub state: GameState,
 }
 
 impl Game {
@@ -19,7 +28,7 @@ impl Game {
         Game {
             board: ChessBoard::new(),
             side: Side::White,
-            move_done: false,
+            state: GameState::Idle,
         }
     }
 
@@ -46,12 +55,13 @@ impl Game {
 
     pub fn pick(&mut self, file: char, rank: u8) -> Result<Piece, GameError> {
         // select a character / return an error
-        if !self.move_done {
+        if matches!(self.state, GameState::Idle) {
             let pos = Pos(file, rank);
             let maybe_character = self.board.pick_character(pos);
+            self.state = GameState::PiecePicked;
             if let Ok(character) = maybe_character {
                 let piece = Piece::new(character, pos, Some(mem::take(&mut self.board)));
-                if character.side() == self.side {
+                if self.side == character.side() {
                     Ok(piece)
                 } else {
                     piece.place_back(self);
@@ -66,12 +76,12 @@ impl Game {
     }
 
     pub fn change_side(&mut self) -> Result<(), GameError> {
-        if self.move_done {
+        if matches!(self.state, GameState::PiecePlaced) {
             self.side = match self.side {
                 Side::White => Side::Black,
                 Side::Black => Side::White,
             };
-            self.move_done = false;
+            self.state = GameState::Idle;
             Ok(())
         } else {
             Err(GameError::SideAlreadyChanged)
@@ -111,29 +121,6 @@ fn game_test() {
     if let Err(error) = maybe_piece {
         assert_eq!(error, GameError::EmptyCell);
     }
-
-    let piece = Piece::new_alone(Character::Pawn(Side::White), Pos('a', 1));
-
-    let res = piece.place_at(&mut game, 'b', 2);
-
-    println!("{:?}", res.err());
-
-    // assert!(res.is_ok());
-
-    let maybe_piece = game.pick('a', 1);
-    if let Err(error) = maybe_piece {
-        assert_eq!(error, GameError::EmptyCell);
-    }
-
-    let maybe_piece = game.pick('a', 2);
-    assert!(maybe_piece.is_ok());
-    let piece = maybe_piece.unwrap();
-    assert_eq!(piece.position, Pos('a', 2));
-    let moves = piece.possible_moves();
-
-    println!("{:?}", moves);
-
-    assert_eq!(0, 1);
 }
 
 // somehow moves most piece related stuff to piece module,

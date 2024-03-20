@@ -1,4 +1,8 @@
-use crate::{characters::moves, chess_board::ChessBoard, pieces::Character};
+use crate::{
+    characters::moves,
+    chess_board::ChessBoard,
+    pieces::{Character, Side},
+};
 
 pub use crate::chess_board::Pos;
 
@@ -76,14 +80,14 @@ pub trait Moving {
                 self.dirs_traverser(dirs, true, |cp, mc, (d_file, d_rank)| {
                     if d_file != 0 {
                         if let Some(other) = mc {
-                            (!Character::same_side(&cp, &other), true)
+                            (!Character::same_side(cp, other), true)
                         } else {
                             (false, true)
                         }
                     } else {
                         (
-                            mc.is_none() && (first_move || d_rank == 1),
-                            (!first_move || d_rank == 2 || mc.is_some()),
+                            mc.is_none() && (first_move || d_rank.abs() == 1),
+                            (!first_move || d_rank.abs() == 2 || mc.is_some()),
                         )
                     }
                 })
@@ -99,7 +103,7 @@ pub trait Moving {
         _pos: dirs::Dir,
     ) -> (bool, bool) {
         if let Some(nei) = maybe_character {
-            (!Character::same_side(&current_character, &nei), true)
+            (!Character::same_side(current_character, nei), true)
         } else {
             (true, false)
         }
@@ -121,7 +125,13 @@ pub trait Moving {
 
         let max = if infinite { 8 } else { 1 };
 
+        let di = if matches!(self.character().side(), Side::White) {
+            1
+        } else {
+            -1
+        };
         for i in 1..=max {
+            let i = i * di;
             let mut to_remove = Vec::new();
             for (index, (d_file, d_rank)) in dirs.iter().enumerate() {
                 if let Ok(pos) = pos.d_pos(d_file * i, d_rank * i) {
