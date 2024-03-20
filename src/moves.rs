@@ -1,4 +1,4 @@
-use crate::{characters::moves, chess_board::ChessBoard, errors::GameError, pieces::Character};
+use crate::{characters::moves, chess_board::ChessBoard, pieces::Character};
 
 pub use crate::chess_board::Pos;
 
@@ -28,8 +28,6 @@ pub mod dirs {
 
     pub const TWO_BOT_LEFT: Dir = (-1, -2);
     pub const TWO_BOT_RIGHT: Dir = (1, -2);
-
-    pub const TWO_TOP: Dir = (0, 2);
 
     pub const ONE_TOP_LEFT: Dir = (-1, 1);
     pub const ONE_TOP_RIGHT: Dir = (1, 1);
@@ -72,16 +70,23 @@ pub trait Moving {
                 self.move_maker(dirs, false)
             }
             Character::Pawn(_) => {
-                let mut moves = Vec::new();
-                // let rank = self.current_position().rank();
-                // for (d_file, d_rank) in moves::Pawn_First.iter() {
-                //     if d_file == 0 {}
-                //     if rank == 2 || rank == 7 {
-                //         // initial positions
-                //     } else {
-                //     };
-                // }
-                moves
+                let Pos(_file, rank) = self.current_position();
+                let first_move = rank == 2 || rank == 7;
+                let dirs = moves::Pawn.to_vec();
+                self.dirs_traverser(dirs, true, |cp, mc, (d_file, d_rank)| {
+                    if d_file != 0 {
+                        if let Some(other) = mc {
+                            (!Character::same_side(&cp, &other), true)
+                        } else {
+                            (false, true)
+                        }
+                    } else {
+                        (
+                            mc.is_none() && (first_move || d_rank == 1),
+                            (!first_move || d_rank == 2 || mc.is_some()),
+                        )
+                    }
+                })
             }
         }
     }
@@ -91,6 +96,7 @@ pub trait Moving {
     fn general_condition(
         current_character: Character,
         maybe_character: Option<Character>,
+        _pos: dirs::Dir,
     ) -> (bool, bool) {
         if let Some(nei) = maybe_character {
             (!Character::same_side(&current_character, &nei), true)
@@ -107,7 +113,7 @@ pub trait Moving {
         &self,
         mut dirs: Vec<dirs::Dir>,
         infinite: bool,
-        adding_condition: impl Fn(Character, Option<Character>) -> (bool, bool),
+        adding_condition: impl Fn(Character, Option<Character>, dirs::Dir) -> (bool, bool),
     ) -> Vec<Pos> {
         let mut moves = Vec::with_capacity(9);
         let pos = self.current_position();
@@ -120,8 +126,11 @@ pub trait Moving {
             for (index, (d_file, d_rank)) in dirs.iter().enumerate() {
                 if let Ok(pos) = pos.d_pos(d_file * i, d_rank * i) {
                     let maybe_character = surounding.character_at(pos);
-                    let (is_valid_pos, stop_here) =
-                        adding_condition(self.character(), maybe_character);
+                    let (is_valid_pos, stop_here) = adding_condition(
+                        self.character(),
+                        maybe_character,
+                        (*d_file * i, *d_rank * i),
+                    );
                     if is_valid_pos {
                         moves.push(pos);
                     }

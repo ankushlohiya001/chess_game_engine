@@ -80,7 +80,7 @@ impl ChessBoard {
             } else {
                 Side::Black
             };
-            self.place_character(Character::Bishop(side), pos);
+            self.place_character(Character::Bishop(side), pos).unwrap();
         }
 
         for pos in positions::Rook {
@@ -89,7 +89,7 @@ impl ChessBoard {
             } else {
                 Side::Black
             };
-            self.place_character(Character::Rook(side), pos);
+            self.place_character(Character::Rook(side), pos).unwrap();
         }
 
         for pos in positions::Knight {
@@ -98,7 +98,7 @@ impl ChessBoard {
             } else {
                 Side::Black
             };
-            self.place_character(Character::Knight(side), pos);
+            self.place_character(Character::Knight(side), pos).unwrap();
         }
 
         for pos in positions::King {
@@ -107,7 +107,7 @@ impl ChessBoard {
             } else {
                 Side::Black
             };
-            self.place_character(Character::King(side), pos);
+            self.place_character(Character::King(side), pos).unwrap();
         }
 
         for pos in positions::Queen {
@@ -116,7 +116,7 @@ impl ChessBoard {
             } else {
                 Side::Black
             };
-            self.place_character(Character::Queen(side), pos);
+            self.place_character(Character::Queen(side), pos).unwrap();
         }
 
         for pos in positions::Pawn {
@@ -125,7 +125,7 @@ impl ChessBoard {
             } else {
                 Side::Black
             };
-            self.place_character(Character::Pawn(side), pos);
+            self.place_character(Character::Pawn(side), pos).unwrap();
         }
     }
 
@@ -207,13 +207,12 @@ fn pos_test() {
     assert_eq!(maybe_pos, Err(GameError::InvalidPosition));
 
     let mut board = ChessBoard::new();
-    // board.place_character_init();
-    board.place_character(Character::Bishop(Side::White), Pos('d', 4));
-    board.place_character(Character::Pawn(Side::Black), Pos('c', 5));
+    board.place_character_init();
+    // board.place_character(Character::Pawn(Side::White), Pos('c', 2));
 
     board.show();
-    let chars = board.pick_character(Pos('d', 4)).unwrap();
-    let pieces = Piece::new(chars, Pos('d', 4), Some(board));
+    let chars = board.pick_character(Pos('c', 2)).unwrap();
+    let pieces = Piece::new(chars, Pos('c', 2), Some(board));
     let moves = pieces.possible_moves();
     println!("{:#?}", moves);
 

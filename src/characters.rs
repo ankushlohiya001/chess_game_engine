@@ -68,7 +68,5 @@ pub mod moves {
         TWO_LEFT_TOP,
     ];
 
-    pub const Pawn_First: [Dir; 4] = [TOP, TWO_TOP, ONE_TOP_LEFT, ONE_TOP_RIGHT];
-
     pub const Pawn: [Dir; 3] = [TOP, ONE_TOP_LEFT, ONE_TOP_RIGHT];
 }
