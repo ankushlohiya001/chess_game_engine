@@ -21,6 +21,13 @@ impl Pos {
         }
     }
 
+    pub fn from(txt: &str) -> Result<Pos, ()>{
+        let fr = txt.chars();
+        let file = fr.next().unwrap();
+        let rank = fr.next().unwrap();
+        Pos::new(file, rank as i32 - '1' as i32)
+    }
+
     pub fn is_valid(file: char, rank: u8) -> bool {
         FILE_RANGE.contains(&(file as u8)) && RANK_RANGE.contains(&rank)
     }
