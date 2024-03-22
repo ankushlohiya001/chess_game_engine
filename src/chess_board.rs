@@ -21,13 +21,6 @@ impl Pos {
         }
     }
 
-    pub fn from(txt: &str) -> Result<Pos, ()>{
-        let fr = txt.chars();
-        let file = fr.next().unwrap();
-        let rank = fr.next().unwrap();
-        Pos::new(file, rank as i32 - '1' as i32)
-    }
-
     pub fn is_valid(file: char, rank: u8) -> bool {
         FILE_RANGE.contains(&(file as u8)) && RANK_RANGE.contains(&rank)
     }
@@ -55,6 +48,16 @@ impl Pos {
         (
             (8 - self.rank()) as usize,
             self.file() as usize - 'a' as usize,
+        )
+    }
+}
+
+impl TryFrom<&str> for Pos {
+    type Error = GameError;
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        Pos::new(
+            s.chars().next().unwrap(),
+            s.chars().nth(1).unwrap().to_digit(10).unwrap() as u8,
         )
     }
 }
@@ -217,9 +220,8 @@ fn pos_test() {
     board.place_character_init();
     // board.place_character(Character::Pawn(Side::White), Pos('c', 2));
 
-    board.show();
-    let chars = board.pick_character(Pos('c', 2)).unwrap();
-    let pieces = Piece::new(chars, Pos('c', 2), Some(board));
-    let moves = pieces.possible_moves();
-    println!("{:#?}", moves);
+    let pos: Pos = Pos::try_from("f8").unwrap();
+
+    println!("{:?}", pos.rank());
+    println!("{:?}", pos.file());
 }
