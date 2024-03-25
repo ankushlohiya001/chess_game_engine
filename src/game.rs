@@ -55,39 +55,38 @@ impl Game {
 
     pub fn pick(&mut self, pos: impl TryInto<Pos>) -> Result<Piece, GameError> {
         // select a character / return an error
-        if matches!(self.state, GameState::Idle) {
-            if let Ok(pos) = pos.try_into() {
-                let maybe_character = self.board.pick_character(pos);
-                self.state = GameState::PiecePicked;
-                if let Ok(character) = maybe_character {
-                    let piece = Piece::new(character, pos, Some(mem::take(&mut self.board)));
-                    if self.side == character.side() {
-                        Ok(piece)
-                    } else {
-                        piece.place_back(self);
-                        Err(GameError::OpponentPiece)
+
+        match self.state {
+            GameState::Idle => match pos.try_into() {
+                Ok(pos) => match self.board.pick_character(pos) {
+                    Ok(character) => {
+                        let piece = Piece::new(character, pos, Some(mem::take(&mut self.board)));
+                        if character.side() == self.side {
+                            Ok(piece)
+                        } else {
+                            piece.place_back(self);
+                            Err(GameError::OpponentPiece)
+                        }
                     }
-                } else {
-                    Err(GameError::EmptyCell)
-                }
-            } else {
-                Err(GameError::InvalidPosition)
-            }
-        } else {
-            Err(GameError::SideNotChanged)
+                    Err(_) => Err(GameError::EmptyCell),
+                },
+                Err(_) => Err(GameError::InvalidPosition),
+            },
+            _ => Err(GameError::SideNotChanged),
         }
     }
 
     pub fn change_side(&mut self) -> Result<(), GameError> {
-        if matches!(self.state, GameState::PiecePlaced) {
-            self.side = match self.side {
-                Side::White => Side::Black,
-                Side::Black => Side::White,
-            };
-            self.state = GameState::Idle;
-            Ok(())
-        } else {
-            Err(GameError::SideAlreadyChanged)
+        match self.state {
+            GameState::PiecePlaced => {
+                self.side = match self.side {
+                    Side::White => Side::Black,
+                    Side::Black => Side::White,
+                };
+                self.state = GameState::Idle;
+                Ok(())
+            }
+            _ => Err(GameError::SideAlreadyChanged),
         }
     }
 

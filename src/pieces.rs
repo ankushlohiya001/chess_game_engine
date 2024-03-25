@@ -96,22 +96,24 @@ impl Piece {
     }
 
     pub fn place_at(&self, game: &mut Game, pos: impl TryInto<Pos>) -> Result<(), GameError> {
-        if let Ok(pos) = pos.try_into() {
-            if self.position == pos || self.can_move(pos) {
-                if let Some(ref surrounding_ref) = self.surrounding {
-                    let mut surrounding = surrounding_ref.borrow_mut();
-                    let res = surrounding.place_character(self.character, pos);
-                    game.board = mem::take(surrounding.deref_mut());
-                    game.state = GameState::PiecePlaced;
-                    res
+        match pos.try_into() {
+            Ok(pos) => {
+                if self.position == pos || self.can_move(pos) {
+                    match self.surrounding {
+                        Some(ref surrounding_ref) => {
+                            let mut surrounding = surrounding_ref.borrow_mut();
+                            let res = surrounding.place_character(self.character, pos);
+                            game.board = mem::take(surrounding.deref_mut());
+                            game.state = GameState::PiecePlaced;
+                            res
+                        }
+                        None => Err(GameError::AlonePiece),
+                    }
                 } else {
-                    Err(GameError::AlonePiece)
+                    Err(GameError::InvalidMove)
                 }
-            } else {
-                Err(GameError::InvalidMove)
             }
-        } else {
-            Err(GameError::InvalidPosition)
+            Err(_) => Err(GameError::InvalidPosition),
         }
     }
 
