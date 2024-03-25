@@ -55,6 +55,7 @@ impl Pos {
 impl TryFrom<&str> for Pos {
     type Error = GameError;
     fn try_from(s: &str) -> Result<Self, Self::Error> {
+        let s = s.to_lowercase();
         Pos::new(
             s.chars().next().unwrap(),
             s.chars().nth(1).unwrap().to_digit(10).unwrap() as u8,

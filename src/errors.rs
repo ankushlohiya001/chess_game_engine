@@ -10,3 +10,8 @@ pub enum GameError {
     InvalidPosition,
     AlonePiece,
 }
+
+pub enum PosErr {
+    InvalidPosition,
+    ParseError,
+}

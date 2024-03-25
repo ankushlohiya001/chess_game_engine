@@ -53,22 +53,25 @@ impl Game {
         self.board.show();
     }
 
-    pub fn pick(&mut self, file: char, rank: u8) -> Result<Piece, GameError> {
+    pub fn pick(&mut self, pos: impl TryInto<Pos>) -> Result<Piece, GameError> {
         // select a character / return an error
         if matches!(self.state, GameState::Idle) {
-            let pos = Pos(file, rank);
-            let maybe_character = self.board.pick_character(pos);
-            self.state = GameState::PiecePicked;
-            if let Ok(character) = maybe_character {
-                let piece = Piece::new(character, pos, Some(mem::take(&mut self.board)));
-                if self.side == character.side() {
-                    Ok(piece)
+            if let Ok(pos) = pos.try_into() {
+                let maybe_character = self.board.pick_character(pos);
+                self.state = GameState::PiecePicked;
+                if let Ok(character) = maybe_character {
+                    let piece = Piece::new(character, pos, Some(mem::take(&mut self.board)));
+                    if self.side == character.side() {
+                        Ok(piece)
+                    } else {
+                        piece.place_back(self);
+                        Err(GameError::OpponentPiece)
+                    }
                 } else {
-                    piece.place_back(self);
-                    Err(GameError::OpponentPiece)
+                    Err(GameError::EmptyCell)
                 }
             } else {
-                Err(GameError::EmptyCell)
+                Err(GameError::InvalidPosition)
             }
         } else {
             Err(GameError::SideNotChanged)
@@ -117,7 +120,7 @@ fn game_test() {
     let whose_turn = game.whose_turn();
     assert_eq!(whose_turn, Side::White);
 
-    let maybe_piece = game.pick('a', 1);
+    let maybe_piece = game.pick("a1");
     if let Err(error) = maybe_piece {
         assert_eq!(error, GameError::EmptyCell);
     }

@@ -5,25 +5,25 @@ fn main() {
     game.start();
     game.show_board();
 
-    let pawn = game.pick('c', 2).unwrap();
+    let pawn = game.pick("c2").unwrap();
 
-    pawn.place_at(&mut game, 'c', 3).unwrap();
-
-    game.change_side().unwrap();
-    let pawn = game.pick('g', 7).unwrap();
-
-    pawn.place_at(&mut game, 'g', 5).unwrap();
+    pawn.place_at(&mut game, "c3").unwrap();
 
     game.change_side().unwrap();
+    let pawn = game.pick("g7").unwrap();
 
-    let bishop = game.pick('c', 1).unwrap();
+    pawn.place_at(&mut game, "g5").unwrap();
+
+    game.change_side().unwrap();
+
+    let bishop = game.pick("c1").unwrap();
 
     println!("{:?}", bishop.possible_moves());
     bishop.place_back(&mut game);
 
-    let knight = game.pick('b', 1).unwrap();
+    let knight = game.pick("b1").unwrap();
     println!("{:?}", knight.possible_moves());
-    knight.place_at(&mut game, 'a', 3);
+    knight.place_at(&mut game, "a3");
 
     game.show_board();
 }

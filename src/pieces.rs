@@ -95,26 +95,28 @@ impl Piece {
         piece_a.side == piece_b.side
     }
 
-    pub fn place_at(&self, game: &mut Game, file: char, rank: u8) -> Result<(), GameError> {
-        let pos = Pos(file, rank);
-        if self.position == pos || self.can_move(pos) {
-            if let Some(ref surrounding_ref) = self.surrounding {
-                let mut surrounding = surrounding_ref.borrow_mut();
-                let res = surrounding.place_character(self.character, pos);
-                game.board = mem::take(surrounding.deref_mut());
-                game.state = GameState::PiecePlaced;
-                res
+    pub fn place_at(&self, game: &mut Game, pos: impl TryInto<Pos>) -> Result<(), GameError> {
+        if let Ok(pos) = pos.try_into() {
+            if self.position == pos || self.can_move(pos) {
+                if let Some(ref surrounding_ref) = self.surrounding {
+                    let mut surrounding = surrounding_ref.borrow_mut();
+                    let res = surrounding.place_character(self.character, pos);
+                    game.board = mem::take(surrounding.deref_mut());
+                    game.state = GameState::PiecePlaced;
+                    res
+                } else {
+                    Err(GameError::AlonePiece)
+                }
             } else {
-                Err(GameError::AlonePiece)
+                Err(GameError::InvalidMove)
             }
         } else {
-            Err(GameError::InvalidMove)
+            Err(GameError::InvalidPosition)
         }
     }
 
     pub fn place_back(&self, game: &mut Game) {
-        let pos = self.position;
-        self.place_at(game, pos.file(), pos.rank()).unwrap();
+        self.place_at(game, self.position).unwrap();
         game.state = GameState::Idle;
     }
 }
